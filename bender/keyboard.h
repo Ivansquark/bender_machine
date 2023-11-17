@@ -9,7 +9,7 @@
 class Keyboard : public QWidget {
     Q_OBJECT
   public:
-    Keyboard(QWidget* parent = nullptr);
+    explicit Keyboard(QWidget* parent = nullptr);
     ~Keyboard();
 
     void setX_pressed(bool state);

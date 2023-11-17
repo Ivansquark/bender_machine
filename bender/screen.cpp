@@ -190,22 +190,38 @@ void Screen::onButEnterClicked() {
     currentXorY = XorY::NONE;
 }
 
+void Screen::onButStart() {
+    if(isStarted) {
+        control->setStart(true);
+        isStarted = false;
+    } else {
+        control->setStart(false);
+        isStarted = true;
+    }
+}
+
 void Screen::init() {
     setFixedSize(1024, 600);
-    connect(butExit, &QPushButton::clicked, [this] { close(); });
+    //connect(butExit, &QPushButton::clicked, [this] { close(); });
     layVleftY->addWidget(labSetPosY);
     layVleftY->addWidget(labPosY);
     layVleftY->addWidget(labGetPosY);
     layVleftX->addWidget(labSetPosX);
     layVleftX->addWidget(labPosX);
     layVleftX->addWidget(labGetPosX);
-    layVright->addStretch(1);
+    layVright->addWidget(programs);
+    layVright->addStretch(0);
     layVright->addWidget(keyboard);
-    layVright->addWidget(butExit);
+    //layVright->addWidget(butExit);
     layH->addLayout(layVleftY);
     layH->addLayout(layVleftX);
     layH->addLayout(layVleftBut);
+    // control
+    layVleft->addWidget(control);
+    layH->addLayout(layVleft);
+    // buttons + program
     layH->addLayout(layVright);
+
     // setLayout(layVleft);
     setLayout(layH);
     connect(keyboard, &Keyboard::onBut0Clicked, this, &Screen::onBut0Clicked);
@@ -228,4 +244,8 @@ void Screen::init() {
     labSetPosY->setStyleSheet(Style::TextTemp);
     labSetPosY->setText(*strTempValY);
     //! TODO: check eeprom programs
+    //-------------- programs -------------------------------------------------
+    //
+    //-------------- control --------------------------------------------------
+    connect(control, &Control::onButStart, this, &Screen::onButStart);
 }

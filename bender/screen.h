@@ -1,7 +1,9 @@
 #ifndef SCREEN_H
 #define SCREEN_H
 
+#include "control.h"
 #include "keyboard.h"
+#include "programs.h"
 
 
 #include <QDialog>
@@ -32,6 +34,7 @@ class Screen : public QDialog {
     void onButXClicked();
     void onButYClicked();
     void onButEnterClicked();
+    void onButStart();
 
   private:
     void init();
@@ -46,11 +49,12 @@ class Screen : public QDialog {
     QVBoxLayout* layVleftY = new QVBoxLayout();
     QVBoxLayout* layVleftX = new QVBoxLayout();
     QVBoxLayout* layVleftBut = new QVBoxLayout();
+    QVBoxLayout* layVleft = new QVBoxLayout();
     QVBoxLayout* layVright = new QVBoxLayout();
     QHBoxLayout* layH = new QHBoxLayout();
     Keyboard* keyboard = new Keyboard(this);
 
-    QPushButton* butExit = new QPushButton("Exit", this);
+    //QPushButton* butExit = new QPushButton("Exit", this);
 
     //--------------- keyboard variables --------------------------------------
     QString valXToString(uint32_t val);
@@ -69,5 +73,10 @@ class Screen : public QDialog {
         Y
     };
     XorY currentXorY = XorY::NONE;
+    //---------------- Programs -----------------------------------------------
+    Programs* programs = new Programs(this);
+    //---------------- Control ------------------------------------------------
+    Control* control = new Control(this);
+    bool isStarted = false;
 };
 #endif // SCREEN_H
