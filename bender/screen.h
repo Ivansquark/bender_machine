@@ -3,6 +3,7 @@
 
 #include "control.h"
 #include "keyboard.h"
+#include "fileops.h"
 #include "programs.h"
 
 
@@ -78,5 +79,7 @@ class Screen : public QDialog {
     //---------------- Control ------------------------------------------------
     Control* control = new Control(this);
     bool isStarted = false;
+    //---------------- File ops -----------------------------------------------
+    Fileops fileops;
 };
 #endif // SCREEN_H

@@ -3,8 +3,7 @@
 
 Programs::Programs(QWidget* parent) : QWidget(parent) { init(); }
 
-Programs::~Programs()
-{
+Programs::~Programs() {
     delete layV1;
     delete layV2;
     delete layH;

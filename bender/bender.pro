@@ -10,6 +10,7 @@ CONFIG += c++17
 
 SOURCES += \
     control.cpp \
+    fileops.cpp \
     keyboard.cpp \
     main.cpp \
     programs.cpp \
@@ -18,6 +19,7 @@ SOURCES += \
 
 HEADERS += \
     control.h \
+    fileops.h \
     keyboard.h \
     programs.h \
     screen.h \
