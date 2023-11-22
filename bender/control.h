@@ -1,6 +1,8 @@
 #ifndef CONTROL_H
 #define CONTROL_H
 
+#include "fileops.h"
+
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QRadioButton>
@@ -13,12 +15,17 @@ class Control : public QWidget {
     explicit Control(QWidget* parent = nullptr);
     ~Control();
     void setStart(bool state);
-  signals:
-    void onButStart();
 
   private:
     void init();
 
+  public:
+    void setPmode(Fileops::Pmode mode);
+  signals:
+    void onButStart();
+    void sendCurrentModePressed(Fileops::Pmode mode);
+
+  private:
     QVBoxLayout* layV = new QVBoxLayout;
     QHBoxLayout* layH1 = new QHBoxLayout;
     QHBoxLayout* layH2 = new QHBoxLayout;

@@ -1,6 +1,8 @@
 #ifndef PROGRAMS_H
 #define PROGRAMS_H
 
+#include "fileops.h"
+
 #include <QHBoxLayout>
 #include <QRadioButton>
 #include <QVBoxLayout>
@@ -11,6 +13,13 @@ class Programs : public QWidget {
   public:
     explicit Programs(QWidget* parent = nullptr);
     ~Programs();
+    void setCurrentButton(Fileops::Pnum num);
+
+  signals:
+    void sendCurrentButtonPressed(Fileops::Pnum num);
+
+  private slots:
+
 
   private:
     void init();

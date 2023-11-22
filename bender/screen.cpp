@@ -11,6 +11,75 @@ Screen::~Screen() {
     delete layH;
 }
 
+void Screen::init() {
+    setFixedSize(1024, 600);
+    // connect(butExit, &QPushButton::clicked, [this] { close(); });
+    layVleftY->addWidget(labSetPosY);
+    layVleftY->addWidget(labPosY);
+    layVleftY->addWidget(labGetPosY);
+    layVleftX->addWidget(labSetPosX);
+    layVleftX->addWidget(labPosX);
+    layVleftX->addWidget(labGetPosX);
+    layVright->addWidget(programs);
+    layVright->addStretch(0);
+    layVright->addWidget(keyboard);
+    // layVright->addWidget(butExit);
+    layH->addLayout(layVleftY);
+    layH->addLayout(layVleftX);
+    layH->addLayout(layVleftBut);
+    // control
+    layVleft->addWidget(control);
+    layH->addLayout(layVleft);
+    // buttons + program
+    layH->addLayout(layVright);
+
+    // setLayout(layVleft);
+    setLayout(layH);
+    connect(keyboard, &Keyboard::onBut0Clicked, this, &Screen::onBut0Clicked);
+    connect(keyboard, &Keyboard::onBut1Clicked, this, &Screen::onBut1Clicked);
+    connect(keyboard, &Keyboard::onBut2Clicked, this, &Screen::onBut2Clicked);
+    connect(keyboard, &Keyboard::onBut3Clicked, this, &Screen::onBut3Clicked);
+    connect(keyboard, &Keyboard::onBut4Clicked, this, &Screen::onBut4Clicked);
+    connect(keyboard, &Keyboard::onBut5Clicked, this, &Screen::onBut5Clicked);
+    connect(keyboard, &Keyboard::onBut6Clicked, this, &Screen::onBut6Clicked);
+    connect(keyboard, &Keyboard::onBut7Clicked, this, &Screen::onBut7Clicked);
+    connect(keyboard, &Keyboard::onBut8Clicked, this, &Screen::onBut8Clicked);
+    connect(keyboard, &Keyboard::onBut9Clicked, this, &Screen::onBut9Clicked);
+    connect(keyboard, &Keyboard::onButXClicked, this, &Screen::onButXClicked);
+    connect(keyboard, &Keyboard::onButYClicked, this, &Screen::onButYClicked);
+    connect(keyboard, &Keyboard::onButEnterClicked, this,
+            &Screen::onButEnterClicked);
+    //-------------- text mem -------------------------------------------------
+    labSetPosX->setStyleSheet(Style::TextTemp);
+    labSetPosX->setText(*strTempValX);
+    labSetPosY->setStyleSheet(Style::TextTemp);
+    labSetPosY->setText(*strTempValY);
+    //! TODO: check eeprom programs
+    //-------------- programs -------------------------------------------------
+    // get last values
+    currentPmode = fileops.getCurrentPmode();
+    currentPnum = fileops.getCurrentPnum();
+    getYX();
+    programs->setCurrentButton(currentPnum);
+    control->setPmode(currentPmode);
+
+    connect(programs, &Programs::sendCurrentButtonPressed,
+            [this](Fileops::Pnum num) {
+                currentPnum = num;
+                fileops.setFilePnum(currentPnum, currentPmode);
+                getYX();
+            });
+
+    //-------------- control --------------------------------------------------
+    connect(control, &Control::onButStart, this, &Screen::onButStart);
+    connect(control, &Control::sendCurrentModePressed,
+            [this](Fileops::Pmode mode) {
+                currentPmode = mode;
+                fileops.setFilePnum(currentPnum, currentPmode);
+                getYX();
+            });
+}
+
 QString Screen::valXToString(uint32_t val) {
     QString str = "";
     int count = 0;
@@ -85,6 +154,18 @@ QString Screen::valYToString(uint32_t val) {
         str = "000.00";
     }
     return str;
+}
+
+void Screen::getYX()
+{
+    Fileops::YX yx{0, 0};
+    yx = fileops.getFileValues(currentPnum, currentPmode);
+    labSetPosY->setText(valYToString(yx.Y));
+    labSetPosY->setStyleSheet(Style::TextFinal);
+    labSetPosX->setText(valXToString(yx.X));
+    labSetPosX->setStyleSheet(Style::TextFinal);
+    currentY = yx.Y;
+    currentX = yx.X;
 }
 
 void Screen::addSymbol(char sym) {
@@ -180,10 +261,16 @@ void Screen::onButEnterClicked() {
         *strValX = *strTempValX;
         labSetPosX->setStyleSheet(Style::TextFinal);
         labSetPosX->setText(*strValX);
+        Fileops::YX yx{currentY, currentX};
+        currentX = yx.X = x;
+        fileops.setFileValues(currentPnum, currentPmode, yx);
     } else if (currentXorY == XorY::Y) {
         *strValY = *strTempValY;
         labSetPosY->setStyleSheet(Style::TextFinal);
         labSetPosY->setText(*strValY);
+        Fileops::YX yx{currentY, currentX};
+        currentY = yx.Y = y;
+        fileops.setFileValues(currentPnum, currentPmode, yx);
     }
     keyboard->setX_pressed(false);
     keyboard->setY_pressed(false);
@@ -191,61 +278,11 @@ void Screen::onButEnterClicked() {
 }
 
 void Screen::onButStart() {
-    if(isStarted) {
+    if (isStarted) {
         control->setStart(true);
         isStarted = false;
     } else {
         control->setStart(false);
         isStarted = true;
     }
-}
-
-void Screen::init() {
-    setFixedSize(1024, 600);
-    //connect(butExit, &QPushButton::clicked, [this] { close(); });
-    layVleftY->addWidget(labSetPosY);
-    layVleftY->addWidget(labPosY);
-    layVleftY->addWidget(labGetPosY);
-    layVleftX->addWidget(labSetPosX);
-    layVleftX->addWidget(labPosX);
-    layVleftX->addWidget(labGetPosX);
-    layVright->addWidget(programs);
-    layVright->addStretch(0);
-    layVright->addWidget(keyboard);
-    //layVright->addWidget(butExit);
-    layH->addLayout(layVleftY);
-    layH->addLayout(layVleftX);
-    layH->addLayout(layVleftBut);
-    // control
-    layVleft->addWidget(control);
-    layH->addLayout(layVleft);
-    // buttons + program
-    layH->addLayout(layVright);
-
-    // setLayout(layVleft);
-    setLayout(layH);
-    connect(keyboard, &Keyboard::onBut0Clicked, this, &Screen::onBut0Clicked);
-    connect(keyboard, &Keyboard::onBut1Clicked, this, &Screen::onBut1Clicked);
-    connect(keyboard, &Keyboard::onBut2Clicked, this, &Screen::onBut2Clicked);
-    connect(keyboard, &Keyboard::onBut3Clicked, this, &Screen::onBut3Clicked);
-    connect(keyboard, &Keyboard::onBut4Clicked, this, &Screen::onBut4Clicked);
-    connect(keyboard, &Keyboard::onBut5Clicked, this, &Screen::onBut5Clicked);
-    connect(keyboard, &Keyboard::onBut6Clicked, this, &Screen::onBut6Clicked);
-    connect(keyboard, &Keyboard::onBut7Clicked, this, &Screen::onBut7Clicked);
-    connect(keyboard, &Keyboard::onBut8Clicked, this, &Screen::onBut8Clicked);
-    connect(keyboard, &Keyboard::onBut9Clicked, this, &Screen::onBut9Clicked);
-    connect(keyboard, &Keyboard::onButXClicked, this, &Screen::onButXClicked);
-    connect(keyboard, &Keyboard::onButYClicked, this, &Screen::onButYClicked);
-    connect(keyboard, &Keyboard::onButEnterClicked, this,
-            &Screen::onButEnterClicked);
-    //-------------- text mem -------------------------------------------------
-    labSetPosX->setStyleSheet(Style::TextTemp);
-    labSetPosX->setText(*strTempValX);
-    labSetPosY->setStyleSheet(Style::TextTemp);
-    labSetPosY->setText(*strTempValY);
-    //! TODO: check eeprom programs
-    //-------------- programs -------------------------------------------------
-    //
-    //-------------- control --------------------------------------------------
-    connect(control, &Control::onButStart, this, &Screen::onButStart);
 }

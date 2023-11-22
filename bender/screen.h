@@ -2,10 +2,9 @@
 #define SCREEN_H
 
 #include "control.h"
+// #include "fileops.h"
 #include "keyboard.h"
-#include "fileops.h"
 #include "programs.h"
-
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -21,7 +20,10 @@ class Screen : public QDialog {
     Screen(QWidget* parent = nullptr);
     ~Screen();
 
-    public slots:
+  private:
+    void init();
+
+  public slots:
     void onBut0Clicked();
     void onBut1Clicked();
     void onBut2Clicked();
@@ -38,7 +40,6 @@ class Screen : public QDialog {
     void onButStart();
 
   private:
-    void init();
     void addSymbol(char sym);
     QLabel* labSetPosY = new QLabel("SetY", this);
     QLabel* labPosY = new QLabel("Y", this);
@@ -55,7 +56,7 @@ class Screen : public QDialog {
     QHBoxLayout* layH = new QHBoxLayout();
     Keyboard* keyboard = new Keyboard(this);
 
-    //QPushButton* butExit = new QPushButton("Exit", this);
+    // QPushButton* butExit = new QPushButton("Exit", this);
 
     //--------------- keyboard variables --------------------------------------
     QString valXToString(uint32_t val);
@@ -76,6 +77,11 @@ class Screen : public QDialog {
     XorY currentXorY = XorY::NONE;
     //---------------- Programs -----------------------------------------------
     Programs* programs = new Programs(this);
+    Fileops::Pmode currentPmode = Fileops::Pmode1;
+    Fileops::Pnum currentPnum = Fileops::P1;
+    uint32_t currentY = 0;
+    uint32_t currentX = 0;
+    void getYX();
     //---------------- Control ------------------------------------------------
     Control* control = new Control(this);
     bool isStarted = false;
