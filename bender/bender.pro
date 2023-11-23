@@ -14,6 +14,7 @@ SOURCES += \
     keyboard.cpp \
     main.cpp \
     programs.cpp \
+    protocol.cpp \
     screen.cpp \
     uart.cpp
 
@@ -22,6 +23,7 @@ HEADERS += \
     fileops.h \
     keyboard.h \
     programs.h \
+    protocol.h \
     screen.h \
     style.h \
     uart.h
