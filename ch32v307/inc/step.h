@@ -1,10 +1,12 @@
 #ifndef STEP_H
 #define STEP_H
 
+#include "buzzer.h"
 #include "gpios.h"
 #include "main.h"
+#include "my_udp.h"
+#include "protocol.h"
 #include "pwm.h"
-#include "buzzer.h"
 
 class StepY {
   public:
@@ -25,11 +27,15 @@ class StepY {
 
     uint32_t stopValue = 0;
     uint32_t currentValue = 0;
+    uint32_t previousValue = 0;
 
     void handler();
 
+    inline bool getLimitPlus() { return zerro.getState(); }
+    inline bool getLimitMinus() { return konc.getState(); }
+
   private:
-    void init();
+    // void init();
 
     inline void enableOn() { en.setHigh(); }
     inline void enableOff() { en.setLow(); }
@@ -71,8 +77,12 @@ class StepX {
 
     uint32_t stopValue = 0;
     uint32_t currentValue = 0;
+    uint32_t previousValue = 0;
 
     void handler();
+    
+    inline bool getLimitPlus() { return konc.getState(); }
+    inline bool getLimitMinus() { return zerro.getState(); }
 
   private:
     void init();

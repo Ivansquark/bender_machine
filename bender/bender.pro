@@ -1,4 +1,4 @@
-QT       += core gui serialport
+QT       += core gui serialport network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -11,22 +11,26 @@ CONFIG += c++17
 SOURCES += \
     control.cpp \
     fileops.cpp \
+    interface.cpp \
     keyboard.cpp \
     main.cpp \
     programs.cpp \
     protocol.cpp \
     screen.cpp \
-    uart.cpp
+    uart.cpp \
+    udp.cpp
 
 HEADERS += \
     control.h \
     fileops.h \
+    interface.h \
     keyboard.h \
     programs.h \
     protocol.h \
     screen.h \
     style.h \
-    uart.h
+    uart.h \
+    udp.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

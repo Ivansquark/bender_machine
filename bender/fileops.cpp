@@ -15,7 +15,7 @@ void Fileops::setFilePnum(Pnum num, Pmode mode) {
         while (std::getline(file, line)) {
             vectStr.emplace_back(line);
         }
-        vectStr[0] = std::to_string(tempNum);
+        vectStr[1] = std::to_string(tempNum);
         file.close();
 
         file.open("programs.csv", std::ios_base::out);
@@ -43,8 +43,8 @@ void Fileops::setFileValues(Pnum num, Pmode mode, YX yx) {
         file.close();
 
         // change values
-        vectStr[0] = std::to_string(index);
-        vectStr[index] = std::to_string(yx.Y) + ',' + std::to_string(yx.X);
+        vectStr[1] = std::to_string(index);
+        vectStr[index + 1] = std::to_string(yx.Y) + ',' + std::to_string(yx.X);
 
         file.open("programs.csv", std::ios_base::out);
         std::string fullStr;
@@ -73,13 +73,51 @@ Fileops::YX Fileops::getFileValues(Pnum num, Pmode mode) {
 
         // get values
 
-        std::string str = vectStr[index];
+        std::string str = vectStr[index + 1];
         size_t pos = str.find(',');
         tempYX.Y = std::stoi(str.substr(0, pos));
         tempYX.X = std::stoi(str.substr(pos + 1));
     }
 
     return tempYX;
+}
+
+Fileops::Pauto Fileops::getFilePauto()
+{
+    std::fstream file("programs.csv", std::ios::in);
+    if (file.is_open()) {
+        std::string line;
+        getline(file, line);
+        qDebug() << line.data();
+        currentPauto = (Pauto)std::stoi(line);
+        file.close();
+    }
+    return currentPauto;
+}
+
+void Fileops::setFilePauto(Pauto val)
+{
+    std::fstream file("programs.csv", std::ios::in);
+    if (file.is_open()) {
+        std::string line;
+        std::vector<std::string> vectStr;
+        while (std::getline(file, line)) {
+            vectStr.emplace_back(line);
+        }
+        file.close();
+        // change values
+        currentPauto = val;
+        vectStr[0] = std::to_string(currentPauto);
+        //write
+        file.open("programs.csv", std::ios_base::out);
+        std::string fullStr;
+        for (auto& i : vectStr) {
+            fullStr += i + "\n";
+        }
+        // qDebug() << fullStr.data();
+        file.write(fullStr.data(), fullStr.size());
+        file.close();
+    }
 }
 
 void Fileops::init() {
@@ -90,6 +128,10 @@ void Fileops::init() {
     std::fstream file("programs.csv", std::ios::in);
     if (file.is_open()) {
         std::string line;
+        getline(file, line);
+        qDebug() << line.data();
+        currentPauto = (Pauto)std::stoi(line);
+        line.clear();
         getline(file, line);
         qDebug() << line.data();
         int num = std::stoi(line);
@@ -105,6 +147,7 @@ void Fileops::init() {
         qDebug() << "cant open file";
         file.open("programs.csv", std::ios_base::out);
         QString str;
+        str += "0\n"; //MANUAL
         str += "1\n";
         for (int i = 0; i < 32; i++) {
             str += "0,0\n";

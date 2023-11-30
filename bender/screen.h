@@ -5,6 +5,7 @@
 // #include "fileops.h"
 #include "keyboard.h"
 #include "programs.h"
+#include "interface.h"
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -19,6 +20,12 @@ class Screen : public QDialog {
   public:
     Screen(QWidget* parent = nullptr);
     ~Screen();
+
+    enum AutoState : uint8_t {
+        MANUAL,
+        SEMI_AUTO,
+        AUTO
+    };
 
   private:
     void init();
@@ -38,6 +45,10 @@ class Screen : public QDialog {
     void onButYClicked();
     void onButEnterClicked();
     void onButStart();
+
+    void getCurrentReply(const Protocol::Reply& reply);
+
+    void moveCycle();
 
   private:
     void addSymbol(char sym);
@@ -79,6 +90,7 @@ class Screen : public QDialog {
     Programs* programs = new Programs(this);
     Fileops::Pmode currentPmode = Fileops::Pmode1;
     Fileops::Pnum currentPnum = Fileops::P1;
+    Fileops::Pauto currentPauto = Fileops::MANUAL;
     uint32_t currentY = 0;
     uint32_t currentX = 0;
     void getYX();
@@ -87,5 +99,11 @@ class Screen : public QDialog {
     bool isStarted = false;
     //---------------- File ops -----------------------------------------------
     Fileops fileops;
+    //---------------- Interface ----------------------------------------------
+    Protocol::Command currentCommand;
+    Protocol::Reply currentReply;
+    std::unique_ptr<Interface> interface = std::make_unique<Interface>();
+    //---------------- timers -------------------------------------------------
+    QTimer moveTimer;
 };
 #endif // SCREEN_H

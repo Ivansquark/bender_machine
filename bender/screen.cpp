@@ -59,9 +59,11 @@ void Screen::init() {
     // get last values
     currentPmode = fileops.getCurrentPmode();
     currentPnum = fileops.getCurrentPnum();
+    currentPauto = fileops.getCurrentPauto();
     getYX();
     programs->setCurrentButton(currentPnum);
     control->setPmode(currentPmode);
+    control->setPauto(currentPauto);
 
     connect(programs, &Programs::sendCurrentButtonPressed,
             [this](Fileops::Pnum num) {
@@ -78,6 +80,29 @@ void Screen::init() {
                 fileops.setFilePnum(currentPnum, currentPmode);
                 getYX();
             });
+    connect(control, &Control::onButManual, [this] {
+        currentPauto = Fileops::MANUAL;
+        fileops.setFilePauto(Fileops::MANUAL);
+    });
+    connect(control, &Control::onButSemiAuto, [this] {
+        currentPauto = Fileops::SEMI_AUTO;
+        fileops.setFilePauto(Fileops::SEMI_AUTO);
+    });
+    connect(control, &Control::onButAuto, [this] {
+        currentPauto = Fileops::AUTO;
+        fileops.setFilePauto(Fileops::AUTO);
+    });
+    connect(control, &Control::onButPlus, [this] {
+        //
+    });
+    connect(control, &Control::onButMinus, [this] {
+        //
+    });
+    //-------------- interface ------------------------------------------------
+    connect(interface.get(), &Interface::sendCurrentReply, this,
+            &Screen::getCurrentReply);
+    //-------------- timers ---------------------------------------------------
+    connect(&moveTimer, &QTimer::timeout, this, &Screen::moveCycle);
 }
 
 QString Screen::valXToString(uint32_t val) {
@@ -156,8 +181,7 @@ QString Screen::valYToString(uint32_t val) {
     return str;
 }
 
-void Screen::getYX()
-{
+void Screen::getYX() {
     Fileops::YX yx{0, 0};
     yx = fileops.getFileValues(currentPnum, currentPmode);
     labSetPosY->setText(valYToString(yx.Y));
@@ -264,6 +288,9 @@ void Screen::onButEnterClicked() {
         Fileops::YX yx{currentY, currentX};
         currentX = yx.X = x;
         fileops.setFileValues(currentPnum, currentPmode, yx);
+        currentCommand.currentCommand = Protocol::Commands::SEND_NEW_VAL_X;
+        currentCommand.val = currentX;
+        interface->getData(currentCommand);
     } else if (currentXorY == XorY::Y) {
         *strValY = *strTempValY;
         labSetPosY->setStyleSheet(Style::TextFinal);
@@ -271,6 +298,9 @@ void Screen::onButEnterClicked() {
         Fileops::YX yx{currentY, currentX};
         currentY = yx.Y = y;
         fileops.setFileValues(currentPnum, currentPmode, yx);
+        currentCommand.currentCommand = Protocol::Commands::SEND_NEW_VAL_Y;
+        currentCommand.val = currentY;
+        interface->getData(currentCommand);
     }
     keyboard->setX_pressed(false);
     keyboard->setY_pressed(false);
@@ -281,8 +311,58 @@ void Screen::onButStart() {
     if (isStarted) {
         control->setStart(true);
         isStarted = false;
+        moveTimer.stop();
+
     } else {
         control->setStart(false);
         isStarted = true;
+        moveTimer.start(1);
+        currentCommand.currentCommand = Protocol::SEND_START_X;
+        interface->getData(currentCommand);
     }
 }
+
+void Screen::getCurrentReply(const Protocol::Reply& reply) {
+    switch (reply.currentReply) {
+    case Protocol::Replies::START_X:
+        break;
+    case Protocol::Replies::START_Y:
+        break;
+    case Protocol::Replies::VAL_X:
+        break;
+    case Protocol::Replies::VAL_Y:
+        break;
+    case Protocol::Replies::CURRENT_Y:
+        labGetPosY->setText(valYToString(reply.val));
+        break;
+    case Protocol::Replies::CURRENT_X:
+        labGetPosX->setText(valXToString(reply.val));
+        break;
+    case Protocol::Replies::LIMIT_Y_PLUS:
+        labGetPosY->setText(valYToString(reply.val));
+        //
+        break;
+    case Protocol::Replies::LIMIT_Y_MINUS:
+        labGetPosY->setText(valYToString(reply.val));
+        break;
+    case Protocol::Replies::LIMIT_X_PLUS:
+        labGetPosX->setText(valXToString(reply.val));
+        break;
+    case Protocol::Replies::LIMIT_X_MINUS:
+        labGetPosX->setText(valXToString(reply.val));
+        break;
+    case Protocol::Replies::STOP_X:
+        labGetPosX->setText(valXToString(reply.val));
+        currentCommand.currentCommand = Protocol::SEND_START_X;
+        interface->getData(currentCommand);
+        break;
+    case Protocol::Replies::STOP_Y:
+        labGetPosY->setText(valYToString(reply.val));
+        moveTimer.stop();
+        break;
+    default:
+        break;
+    }
+}
+
+void Screen::moveCycle() {}

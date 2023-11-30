@@ -42,6 +42,16 @@ class Fileops : public QObject {
     Pnum getCurrentPnum() { return currentPnum; }
     Pnum currentPnum = P1;
 
+    enum Pauto : uint8_t {
+        MANUAL,
+        SEMI_AUTO,
+        AUTO
+    };
+    void setCurrentPauto(Pauto state) { currentPauto = state; }
+    Pauto getCurrentPauto() { return currentPauto; }
+    Pauto currentPauto = MANUAL;
+
+
     // set values
     struct YX {
         uint32_t Y = 0;
@@ -51,6 +61,8 @@ class Fileops : public QObject {
     void setFilePnum(Pnum num, Pmode mode);
     void setFileValues(Pnum num, Pmode mode, YX yx);
     YX getFileValues(Pnum num, Pmode mode);
+    Pauto getFilePauto();
+    void setFilePauto(Pauto val);
   signals:
     void sendCurrentPmode(Pmode);
     void sendCurrentPnum(Pnum);

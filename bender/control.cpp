@@ -79,6 +79,20 @@ void Control::init() {
             [this] { emit sendCurrentModePressed(Fileops::Pmode1); });
     connect(radioP2, &QRadioButton::clicked,
             [this] { emit sendCurrentModePressed(Fileops::Pmode2); });
+    connect(butManual, &QPushButton::clicked, [this] {
+        emit onButManual();
+        setPauto(Fileops::MANUAL);
+    });
+    connect(butSemiAuto, &QPushButton::clicked, [this] {
+        emit onButSemiAuto();
+        setPauto(Fileops::SEMI_AUTO);
+    });
+    connect(butAuto, &QPushButton::clicked, [this] {
+        emit onButAuto();
+        setPauto(Fileops::AUTO);
+    });
+    connect(butPlus, &QPushButton::clicked, [this] { emit onButPlus(); });
+    connect(butMinus, &QPushButton::clicked, [this] { emit onButMinus(); });
 }
 
 void Control::setPmode(Fileops::Pmode mode) {
@@ -86,5 +100,27 @@ void Control::setPmode(Fileops::Pmode mode) {
         radioP1->setChecked(true);
     } else {
         radioP2->setChecked(true);
+    }
+}
+
+void Control::setPauto(Fileops::Pauto autoState) {
+    switch (autoState) {
+    case Fileops::Pauto::MANUAL:
+        butManual->setStyleSheet(Style::ButPressed);
+        butSemiAuto->setStyleSheet(Style::ButReleased);
+        butAuto->setStyleSheet(Style::ButReleased);
+        break;
+    case Fileops::Pauto::SEMI_AUTO:
+        butSemiAuto->setStyleSheet(Style::ButPressed);
+        butManual->setStyleSheet(Style::ButReleased);
+        butAuto->setStyleSheet(Style::ButReleased);
+        break;
+    case Fileops::Pauto::AUTO:
+        butAuto->setStyleSheet(Style::ButPressed);
+        butSemiAuto->setStyleSheet(Style::ButReleased);
+        butManual->setStyleSheet(Style::ButReleased);
+        break;
+    default:
+        break;
     }
 }

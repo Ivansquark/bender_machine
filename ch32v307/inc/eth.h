@@ -9,9 +9,6 @@
 #include "string.h"
 #include "systim.h"
 
-#include "lwip_list.h"
-#include "memb.h"
-
 #include "ethernetif.h"
 #include "lwip/def.h"
 #include "lwip/init.h"
@@ -54,8 +51,8 @@ extern ETH_DMADESCTypeDef DMATxDscrTab[ETH_TXBUFNB];
 u32_t sys_now(void);
 uint32_t CH30x_RNG_GENERATE();
 extern volatile uint8_t net_data_led_require;
-LIST_EXTERN(ch307_mac_rec);
-MEMB_EXTERN(ch307_mac_rec_frame_mem);
+//LIST_EXTERN(ch307_mac_rec);
+//MEMB_EXTERN(ch307_mac_rec_frame_mem);
 class Eth {
   public:
     Eth(uint8_t ip0 = 192, uint8_t ip1 = 168, uint8_t ip2 = 1, uint8_t ip3 = 6);

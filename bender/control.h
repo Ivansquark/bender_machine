@@ -21,9 +21,15 @@ class Control : public QWidget {
 
   public:
     void setPmode(Fileops::Pmode mode);
+    void setPauto(Fileops::Pauto autoState);
   signals:
     void onButStart();
     void sendCurrentModePressed(Fileops::Pmode mode);
+    void onButManual();
+    void onButSemiAuto();
+    void onButAuto();
+    void onButPlus();
+    void onButMinus();
 
   private:
     QVBoxLayout* layV = new QVBoxLayout;

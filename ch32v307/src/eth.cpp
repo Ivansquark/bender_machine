@@ -2,8 +2,6 @@
 
 Eth* Eth::pThis = nullptr;
 /* Globe variable */
-LIST(ch307_mac_rec);
-MEMB(ch307_mac_rec_frame_mem, FrameTypeDef, ETH_RXBUFNB);
 
 __attribute__((aligned(4))) ETH_DMADESCTypeDef DMARxDscrTab[ETH_RXBUFNB];
 __attribute__((aligned(4))) ETH_DMADESCTypeDef DMATxDscrTab[ETH_TXBUFNB];
@@ -34,7 +32,7 @@ void Eth::rx_handler() {
     p = Eth::ETH_RxPkt_ChainMode();
     if (p != nullptr) {
         ethernetif_input(&WCH_NetIf);
-        if(GPIOD->OUTDR & GPIO_OUTDR_ODR14) {
+        if (GPIOD->OUTDR & GPIO_OUTDR_ODR14) {
             LED_DATASET(false);
         } else {
             LED_DATASET(true);
@@ -54,9 +52,13 @@ void Eth::init_phy() {
     // GPIO_Init(GPIOA, &GPIO);
 
     RCC_PLL3Cmd(DISABLE);
-    // for 24 MHz quarz
-    RCC_PREDIV2Config(RCC_PREDIV2_Div6);
+    // for 8 MHz quarz
+    RCC_PREDIV2Config(RCC_PREDIV2_Div2);
     RCC_PLL3Config(RCC_PLL3Mul_15);
+    // for 24 MHz quarz
+    //RCC_PREDIV2Config(RCC_PREDIV2_Div6);
+    //RCC_PLL3Config(RCC_PLL3Mul_15);
+    
     // RCC_MCOConfig(RCC_MCO_PLL3CLK);
     RCC_PLL3Cmd(ENABLE);
     if (RESET == RCC_GetFlagStatus(RCC_FLAG_PLL3RDY)) {
@@ -115,7 +117,9 @@ void Eth::init_phy() {
     ETH_SoftwareReset();
 
     /* Wait for software reset */
-    if (ETH->DMABMR & ETH_DMABMR_SR) { SysTim::delay_10us(100); }
+    if (ETH->DMABMR & ETH_DMABMR_SR) {
+        SysTim::delay_10us(100);
+    }
 
     /* ETHERNET Configuration
      * ------------------------------------------------------*/
@@ -182,9 +186,13 @@ void Eth::init_phy() {
             ETH->MACMIIAR |= (0 << 11); // PHY address = 1 !!!!
             ETH->MACMIIAR |= ETH_MACMIIAR_CR_Div42;
             smiStatusReg = ETH_ReadPHYRegister(i, PHY_BSR);
-            if (smiStatusReg != 0xFFFF) { break; }
+            if (smiStatusReg != 0xFFFF) {
+                break;
+            }
         }
-        if (smiStatusReg != 0xFFFF) { break; }
+        if (smiStatusReg != 0xFFFF) {
+            break;
+        }
         // else {
         //     smi_write_DP83848C(BMCR, 0x8000);
         //     for (volatile int i = 0; i < 20000000; i++) {}
@@ -206,7 +214,7 @@ void Eth::init_phy() {
     RegValue = ETH_ReadPHYRegister(PHY_ADDRESS, PHY_BSR);
     if ((RegValue & (PHY_Linked_Status)) == 0) {
         // not linked
-        //while ((RegValue & (PHY_Linked_Status)) == 0) {
+        // while ((RegValue & (PHY_Linked_Status)) == 0) {
         //    SysTim::delay_10us(100); // 1 ms
         //}
         SysTim::delay_10us(100); // 1 ms
@@ -216,7 +224,7 @@ void Eth::init_phy() {
     RegValue = ETH_ReadPHYRegister(PHY_ADDRESS, PHY_BSR);
     if ((RegValue & PHY_AutoNego_Complete) == 0) {
         // autonegotiation fault
-        //while (1) {}
+        // while (1) {}
         SysTim::delay_10us(100); // 1 ms
     }
 
@@ -240,17 +248,19 @@ void Eth::init_phy() {
     /* MACCCR RGMII */
     tmpreg = ETH->MACCR;
     tmpreg &= MACCR_CLEAR_MASK;
-    tmpreg |= (uint32_t)(
-        ETH_InitStructure->ETH_Watchdog | ETH_InitStructure->ETH_Jabber |
-        ETH_InitStructure->ETH_InterFrameGap |
-        ETH_InitStructure->ETH_CarrierSense | ETH_InitStructure->ETH_Speed |
-        ETH_InitStructure->ETH_ReceiveOwn |
-        ETH_InitStructure->ETH_LoopbackMode | ETH_InitStructure->ETH_Mode |
-        ETH_InitStructure->ETH_ChecksumOffload |
-        ETH_InitStructure->ETH_RetryTransmission |
-        ETH_InitStructure->ETH_AutomaticPadCRCStrip |
-        ETH_InitStructure->ETH_BackOffLimit |
-        ETH_InitStructure->ETH_DeferralCheck);
+    tmpreg |= (uint32_t)(ETH_InitStructure->ETH_Watchdog |
+                         ETH_InitStructure->ETH_Jabber |
+                         ETH_InitStructure->ETH_InterFrameGap |
+                         ETH_InitStructure->ETH_CarrierSense |
+                         ETH_InitStructure->ETH_Speed |
+                         ETH_InitStructure->ETH_ReceiveOwn |
+                         ETH_InitStructure->ETH_LoopbackMode |
+                         ETH_InitStructure->ETH_Mode |
+                         ETH_InitStructure->ETH_ChecksumOffload |
+                         ETH_InitStructure->ETH_RetryTransmission |
+                         ETH_InitStructure->ETH_AutomaticPadCRCStrip |
+                         ETH_InitStructure->ETH_BackOffLimit |
+                         ETH_InitStructure->ETH_DeferralCheck);
     /* MAC */
     ETH->MACCR = (uint32_t)tmpreg;
 #ifdef USE10BASE_T
@@ -308,15 +318,16 @@ void Eth::init_phy() {
                          ETH_InitStructure->ETH_SecondFrameOperate);
     ETH->DMAOMR = (uint32_t)tmpreg;
 
-    ETH->DMABMR = (uint32_t)(
-        ETH_InitStructure->ETH_AddressAlignedBeats |
-        ETH_InitStructure->ETH_FixedBurst |
-        ETH_InitStructure->ETH_RxDMABurstLength | /* !! if 4xPBL is selected for
-                                                     Tx or Rx it is applied for
-                                                     the other */
-        ETH_InitStructure->ETH_TxDMABurstLength |
-        (ETH_InitStructure->ETH_DescriptorSkipLength << 2) |
-        ETH_InitStructure->ETH_DMAArbitration | ETH_DMABMR_USP);
+    ETH->DMABMR =
+        (uint32_t)(ETH_InitStructure->ETH_AddressAlignedBeats |
+                   ETH_InitStructure->ETH_FixedBurst |
+                   ETH_InitStructure
+                       ->ETH_RxDMABurstLength | /* !! if 4xPBL is selected for
+                                                   Tx or Rx it is applied for
+                                                   the other */
+                   ETH_InitStructure->ETH_TxDMABurstLength |
+                   (ETH_InitStructure->ETH_DescriptorSkipLength << 2) |
+                   ETH_InitStructure->ETH_DMAArbitration | ETH_DMABMR_USP);
     mem_free(ETH_InitStructure);
 
     startMacFilteringSelf();
@@ -363,7 +374,9 @@ void Eth::init_lwip(uint8_t IP0, uint8_t IP1, uint8_t IP2, uint8_t IP3,
     IP4_ADDR(&netmask, 255, 255, 255, 0);
     IP4_ADDR(&gw, IP0, IP1, IP2, 1);
     /* Initilialize the LwIP stack without RTOS */
-    if (!first) { netif_remove(&WCH_NetIf); }
+    if (!first) {
+        netif_remove(&WCH_NetIf);
+    }
     /* add the network interface (IPv4/IPv6) without RTOS */
     netif_add(&WCH_NetIf, &ipaddr, &netmask, &gw, NULL, &ethernetif_init,
               &ethernet_input);
@@ -380,7 +393,7 @@ void Eth::init_lwip(uint8_t IP0, uint8_t IP1, uint8_t IP2, uint8_t IP3,
         Note: you must call dhcp_fine_tmr() and dhcp_coarse_tmr() at
         the predefined regular intervals after starting the client.
         You can peek in the netif->dhcp struct for the actual DHCP status.*/
-        err = dhcp_start(&WCH_NetIf); //开启dhcp
+        err = dhcp_start(&WCH_NetIf); // 开启dhcp
         if (err == ERR_OK) {
             printf("lwip dhcp start success...\n\n");
         } else {
@@ -391,9 +404,15 @@ void Eth::init_lwip(uint8_t IP0, uint8_t IP1, uint8_t IP2, uint8_t IP3,
         // lwip_init_success_callback(&(WCH_NetIf.ip_addr));
 
 #endif
-        if (list_head(ch307_mac_rec) != NULL) {
-            /* received a packet */
+        void* p = nullptr;
+        p = Eth::ETH_RxPkt_ChainMode();
+        if (p != nullptr) {
             ethernetif_input(&WCH_NetIf);
+            if (GPIOD->OUTDR & GPIO_OUTDR_ODR14) {
+                LED_DATASET(false);
+            } else {
+                LED_DATASET(true);
+            }
         }
     } else {
         /* When the netif link is down this function must be called */
@@ -504,7 +523,9 @@ u32_t sys_now(void) { return SysTim::getCounter(); }
 
 uint32_t CH30x_RNG_GENERATE() {
     while (1) {
-        if (RNG_GetFlagStatus(RNG_FLAG_DRDY) == SET) { break; }
+        if (RNG_GetFlagStatus(RNG_FLAG_DRDY) == SET) {
+            break;
+        }
         if (RNG_GetFlagStatus(RNG_FLAG_CECS) == SET) {
             RNG_ClearFlag(RNG_FLAG_CECS);
             SysTim::delay_10us(10);

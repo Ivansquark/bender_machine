@@ -11,17 +11,20 @@ enum Direction {
 };
 
 enum Commands {
-    SEND_START,
+    SEND_START_Y,
+    SEND_START_X,
     SEND_NEW_VAL_Y,
     SEND_NEW_VAL_X,
     SEND_Y_PLUS,
     SEND_Y_MINUS,
     SEND_X_PLUS,
     SEND_X_MINUS,
+    REPLY_PC
 };
 
 enum Replies {
-    START,
+    START_X,
+    START_Y,
     VAL_Y,
     VAL_X,
     CURRENT_Y,
@@ -30,8 +33,21 @@ enum Replies {
     LIMIT_Y_MINUS,
     LIMIT_X_PLUS,
     LIMIT_X_MINUS,
-    STOP
+    STOP_X,
+    STOP_Y,
+    REPLY_CONTROLLER
 };
+#pragma pack(push, 1)
+struct Command {
+    Commands currentCommand;
+    uint32_t val;
+};
+struct Reply {
+    Replies currentReply;
+    uint32_t val;
+};
+#pragma pack(pop)
+
 // send
 // 0 - TO
 // 1 - COMMAND
