@@ -353,7 +353,7 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         break;
     case Protocol::Replies::STOP_X:
         labGetPosX->setText(valXToString(reply.val));
-        currentCommand.currentCommand = Protocol::SEND_START_X;
+        currentCommand.currentCommand = Protocol::SEND_START_Y;
         interface->getData(currentCommand);
         break;
     case Protocol::Replies::STOP_Y:

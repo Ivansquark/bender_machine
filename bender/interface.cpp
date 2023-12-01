@@ -24,6 +24,7 @@ void Interface::getData(const Protocol::Command& command) {
     arr.append((uint8_t)(currentCommand.val >> 8));
     arr.append((uint8_t)(currentCommand.val));
     udp->sendDataToUdp(arr);
+    timerReply.start(100);
     // if usb ...
 }
 

@@ -3,7 +3,7 @@
 Protocol::Command Protocol::parseFrame(uint8_t* arr,
                                        [[maybe_unused]] uint8_t len) {
     Command temp{(Commands)arr[1], (uint32_t)((arr[2] << 24) + (arr[3] << 16) +
-                                              (arr[3] << 8) + arr[4])};
+                                              (arr[4] << 8) + arr[5])};
     if (arr[0] != TO) {
         temp.currentCommand = ERROR;
         return temp;

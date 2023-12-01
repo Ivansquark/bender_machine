@@ -6,31 +6,38 @@ StateMachine::StateMachine() { pThis = this; }
 
 void StateMachine::handler() {
     //--------------  receive handler  ----------------------------------------
+    if (udp.WaitForReply) {
+        if (IsTimeout) {
+            udp.WaitForReply = false;
+            udp.MustResend = true;
+            IsTimeout = false;
+        }
+    }
     // udp handler parse reply
     if (udp.IsDataReceived) {
         udp.IsDataReceived = false;
         if (udp.receiveCommand.currentCommand == Protocol::Commands::REPLY_PC) {
             udp.WaitForReply = false;
             udp.MustResend = false;
+            udp.MustSend = false;
+            timerReplyStop();
         }
-        if (udp.WaitForReply) {
-            // check timer if not send another time
-            // if(timeout)
-            if (IsTimeout) {
-                udp.WaitForReply = false;
-                udp.MustResend = true;
-                IsTimeout = false;
-            }
-        } else {
+        // if (udp.WaitForReply) {
+        //     // check timer if not send another time
+        //     // if(timeout)
+        // }
+        else {
             // parse data
+            udp.sendReply();
             parse();
-            udp.MustSendReply = true;
+            // udp.MustSendReply = true;
+            timerReplyStop();
         }
     }
-    if (udp.MustSendReply) {
-        udp.sendReply();
-        udp.MustSendReply = false;
-    }
+    // if (udp.MustSendReply) {
+    //     udp.sendReply();
+    //     udp.MustSendReply = false;
+    // }
     //--------------  move handler  -------------------------------------------
     stepX.handler();
     stepY.handler();
@@ -46,27 +53,31 @@ void StateMachine::handler() {
     //--------------  send handler  -------------------------------------------
     if (udp.MustSend) {
         udp.MustSend = false;
+        udp.MustResend = false;
         // send last reply
         udp.sendData(udp.reply);
         udp.WaitForReply = true;
-        timerReplyStart(10);
+        timerReplyStart(100);
     }
     //--------------  resend handler  -----------------------------------------
     if (udp.MustResend) {
+        udp.MustSend = false;
         udp.MustResend = false;
         udp.sendData(udp.reply);
         udp.WaitForReply = true;
+        timerReplyStart(100);
     }
-    // send handler
 }
 
 void StateMachine::parse() {
     switch (udp.receiveCommand.currentCommand) {
     case Protocol::SEND_START_X:
         stepX.currentState = StepX::START_MOVING;
+        stepX.currentValue = udp.receiveCommand.val;
         break;
     case Protocol::SEND_START_Y:
         stepY.currentState = StepY::START_MOVING;
+        stepY.currentValue = udp.receiveCommand.val;
         break;
     case Protocol::SEND_NEW_VAL_X:
         stepX.stopValue = udp.receiveCommand.val;
