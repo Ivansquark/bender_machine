@@ -18,7 +18,8 @@ SOURCES += \
     protocol.cpp \
     screen.cpp \
     uart.cpp \
-    udp.cpp
+    udp.cpp \
+    valtostr.cpp
 
 HEADERS += \
     control.h \
@@ -30,7 +31,8 @@ HEADERS += \
     screen.h \
     style.h \
     uart.h \
-    udp.h
+    udp.h \
+    valtostr.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

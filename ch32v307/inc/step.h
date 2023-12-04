@@ -34,6 +34,8 @@ class StepY {
     inline bool getLimitPlus() { return zerro.getState(); }
     inline bool getLimitMinus() { return konc.getState(); }
 
+    inline void clearPwmCounter() {pwm.counterY = 0;}
+
   private:
     // void init();
 
@@ -83,6 +85,8 @@ class StepX {
     
     inline bool getLimitPlus() { return konc.getState(); }
     inline bool getLimitMinus() { return zerro.getState(); }
+
+    inline void clearPwmCounter() {pwm.counterX = 0;}
 
   private:
     void init();

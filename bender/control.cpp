@@ -93,6 +93,7 @@ void Control::init() {
     });
     connect(butPlus, &QPushButton::clicked, [this] { emit onButPlus(); });
     connect(butMinus, &QPushButton::clicked, [this] { emit onButMinus(); });
+    connect(butDash, &QPushButton::clicked, [this] { emit onButDash(); });
 }
 
 void Control::setPmode(Fileops::Pmode mode) {

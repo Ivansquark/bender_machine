@@ -70,7 +70,7 @@ __attribute__((interrupt)) void TIM1_UP_IRQHandler() {
     if (Pwm::currentDirectionY == Pwm::DirectionY::UP) {
         Pwm::counterY++;
     } else {
-        if (Pwm::counterY) {
+        if (Pwm::counterY > 0) {
             Pwm::counterY--;
         }
     }
@@ -81,7 +81,7 @@ __attribute__((interrupt)) void TIM9_UP_IRQHandler() {
     if (Pwm::currentDirectionX == Pwm::DirectionX::PLUS) {
         Pwm::counterX++;
     } else {
-        if (Pwm::counterX) {
+        if (Pwm::counterX > 0) {
             Pwm::counterX--;
         }
     }

@@ -93,10 +93,28 @@ void Screen::init() {
         fileops.setFilePauto(Fileops::AUTO);
     });
     connect(control, &Control::onButPlus, [this] {
-        //
+        if (currentXorY == XorY::Y) {
+            currentCommand.currentCommand = Protocol::Commands::SEND_Y_PLUS;
+            interface->sendData(currentCommand);
+        } else if (currentXorY == XorY::X) {
+            currentCommand.currentCommand = Protocol::Commands::SEND_X_PLUS;
+            interface->sendData(currentCommand);
+        }
     });
     connect(control, &Control::onButMinus, [this] {
-        //
+        if (currentXorY == XorY::Y) {
+            currentCommand.currentCommand = Protocol::Commands::SEND_Y_MINUS;
+            interface->sendData(currentCommand);
+        } else if (currentXorY == XorY::X) {
+            currentCommand.currentCommand = Protocol::Commands::SEND_X_MINUS;
+            interface->sendData(currentCommand);
+        }
+    });
+    connect(control, &Control::onButDash, [this] {
+        if(!IsCalibrated) {
+            currentCommand.currentCommand = Protocol::Commands::SEND_CALIBRATION;
+            interface->sendData(currentCommand);
+        }
     });
     //-------------- interface ------------------------------------------------
     connect(interface.get(), &Interface::sendCurrentReply, this,
@@ -105,88 +123,14 @@ void Screen::init() {
     connect(&moveTimer, &QTimer::timeout, this, &Screen::moveCycle);
 }
 
-QString Screen::valXToString(uint32_t val) {
-    QString str = "";
-    int count = 0;
-    uint8_t arr[4] = {0};
-    while (val) {
-        arr[count] = val % 10;
-        val /= 10;
-        count++;
-    }
-    if (count == 1) {
-        str += "000.";
-        str += QString::number(arr[0]);
-    } else if (count == 2) {
-        str += "00";
-        str += QString::number(arr[1]);
-        str += ".";
-        str += QString::number(arr[0]);
-    } else if (count == 3) {
-        str += "0";
-        str += QString::number(arr[2]);
-        str += QString::number(arr[1]);
-        str += ".";
-        str += QString::number(arr[0]);
-    } else if (count == 4) {
-        str += QString::number(arr[3]);
-        str += QString::number(arr[2]);
-        str += QString::number(arr[1]);
-        str += ".";
-        str += QString::number(arr[0]);
-    } else {
-        str = "000.0";
-    }
-    return str;
-}
-QString Screen::valYToString(uint32_t val) {
-    QString str = "";
-    int count = 0;
-    uint8_t arr[5] = {0};
-    while (val) {
-        arr[count] = val % 10;
-        val /= 10;
-        count++;
-    }
-    if (count == 1) {
-        str += "000.0";
-        str += QString::number(arr[0]);
-    } else if (count == 2) {
-        str += "000.";
-        str += QString::number(arr[1]);
-        str += QString::number(arr[0]);
-    } else if (count == 3) {
-        str += "00";
-        str += QString::number(arr[2]);
-        str += ".";
-        str += QString::number(arr[1]);
-        str += QString::number(arr[0]);
-    } else if (count == 4) {
-        str += "0";
-        str += QString::number(arr[3]);
-        str += QString::number(arr[2]);
-        str += ".";
-        str += QString::number(arr[1]);
-        str += QString::number(arr[0]);
-    } else if (count == 5) {
-        str += QString::number(arr[4]);
-        str += QString::number(arr[3]);
-        str += QString::number(arr[2]);
-        str += ".";
-        str += QString::number(arr[1]);
-        str += QString::number(arr[0]);
-    } else {
-        str = "000.00";
-    }
-    return str;
-}
+
 
 void Screen::getYX() {
     Fileops::YX yx{0, 0};
     yx = fileops.getFileValues(currentPnum, currentPmode);
-    labSetPosY->setText(valYToString(yx.Y));
+    labSetPosY->setText(valToStr.valYToString(yx.Y));
     labSetPosY->setStyleSheet(Style::TextFinal);
-    labSetPosX->setText(valXToString(yx.X));
+    labSetPosX->setText(valToStr.valXToString(yx.X));
     labSetPosX->setStyleSheet(Style::TextFinal);
     currentY = yx.Y;
     currentX = yx.X;
@@ -197,12 +141,12 @@ void Screen::addSymbol(char sym) {
         if (!symCountX) {
             if (sym == '0') return;
             x = sym - 0x30;
-            *strTempValX = valXToString(x);
+            *strTempValX = valToStr.valXToString(x);
             symCountX++;
         } else if (symCountX < 4) {
             x *= 10;
             x += (sym - 0x30);
-            *strTempValX = valXToString(x);
+            *strTempValX = valToStr.valXToString(x);
             symCountX++;
         } else
             return;
@@ -212,12 +156,12 @@ void Screen::addSymbol(char sym) {
         if (!symCountY) {
             if (sym == '0') return;
             y = sym - 0x30;
-            *strTempValY = valYToString(y);
+            *strTempValY = valToStr.valYToString(y);
             symCountY++;
         } else if (symCountY < 5) {
             y *= 10;
             y += (sym - 0x30);
-            *strTempValY = valYToString(y);
+            *strTempValY = valToStr.valYToString(y);
             symCountY++;
         } else
             return;
@@ -290,7 +234,7 @@ void Screen::onButEnterClicked() {
         fileops.setFileValues(currentPnum, currentPmode, yx);
         currentCommand.currentCommand = Protocol::Commands::SEND_NEW_VAL_X;
         currentCommand.val = currentX;
-        interface->getData(currentCommand);
+        interface->sendData(currentCommand);
     } else if (currentXorY == XorY::Y) {
         *strValY = *strTempValY;
         labSetPosY->setStyleSheet(Style::TextFinal);
@@ -300,7 +244,7 @@ void Screen::onButEnterClicked() {
         fileops.setFileValues(currentPnum, currentPmode, yx);
         currentCommand.currentCommand = Protocol::Commands::SEND_NEW_VAL_Y;
         currentCommand.val = currentY;
-        interface->getData(currentCommand);
+        interface->sendData(currentCommand);
     }
     keyboard->setX_pressed(false);
     keyboard->setY_pressed(false);
@@ -318,46 +262,70 @@ void Screen::onButStart() {
         isStarted = true;
         moveTimer.start(1);
         currentCommand.currentCommand = Protocol::SEND_START_X;
-        interface->getData(currentCommand);
+        currentCommand.val = currentX;
+        interface->sendData(currentCommand);
     }
 }
 
 void Screen::getCurrentReply(const Protocol::Reply& reply) {
     switch (reply.currentReply) {
     case Protocol::Replies::START_X:
+        qDebug() << "Get: Replies::START_X" << reply.val;
         break;
     case Protocol::Replies::START_Y:
+        qDebug() << "Get: Replies::START_Y" << reply.val;
         break;
     case Protocol::Replies::VAL_X:
+        qDebug() << "Get: Replies::VAL_X" << reply.val;
         break;
     case Protocol::Replies::VAL_Y:
+        qDebug() << "Get: Replies::VAL_Y" << reply.val;
         break;
     case Protocol::Replies::CURRENT_Y:
-        labGetPosY->setText(valYToString(reply.val));
+        qDebug() << "Get: Replies::CURRENT_Y" << reply.val;
+        labGetPosY->setText(valToStr.valYToString(reply.val));
+        if (currentXorY == XorY::Y) {
+            currentY = reply.val;
+            labSetPosY->setStyleSheet(Style::TextFinal);
+            labSetPosY->setText(valToStr.valYToString(currentY));
+        }
         break;
     case Protocol::Replies::CURRENT_X:
-        labGetPosX->setText(valXToString(reply.val));
+        qDebug() << "Get: Replies::CURRENT_X" << reply.val;
+        labGetPosX->setText(valToStr.valXToString(reply.val));
+        if (currentXorY == XorY::X) {
+            currentX = reply.val;
+            labSetPosX->setStyleSheet(Style::TextFinal);
+            labSetPosX->setText(valToStr.valXToString(currentX));
+        }
         break;
     case Protocol::Replies::LIMIT_Y_PLUS:
-        labGetPosY->setText(valYToString(reply.val));
+        qDebug() << "Get: Replies::LIMIT_Y_PLUS" << reply.val;
+        labGetPosY->setText(valToStr.valYToString(reply.val));
         //
         break;
     case Protocol::Replies::LIMIT_Y_MINUS:
-        labGetPosY->setText(valYToString(reply.val));
+        qDebug() << "Get: Replies::LIMIT_Y_MINUS" << reply.val;
+        labGetPosY->setText(valToStr.valYToString(reply.val));
         break;
     case Protocol::Replies::LIMIT_X_PLUS:
-        labGetPosX->setText(valXToString(reply.val));
+        qDebug() << "Get: Replies::LIMIT_X_PLUS" << reply.val;
+        labGetPosX->setText(valToStr.valXToString(reply.val));
         break;
     case Protocol::Replies::LIMIT_X_MINUS:
-        labGetPosX->setText(valXToString(reply.val));
+        qDebug() << "Get: Replies::LIMIT_X_MINUS" << reply.val;
+        labGetPosX->setText(valToStr.valXToString(reply.val));
         break;
     case Protocol::Replies::STOP_X:
-        labGetPosX->setText(valXToString(reply.val));
+        qDebug() << "Get: Replies::STOP_X" << reply.val;
+        labGetPosX->setText(valToStr.valXToString(reply.val));
         currentCommand.currentCommand = Protocol::SEND_START_Y;
-        interface->getData(currentCommand);
+        currentCommand.val = currentY;
+        interface->sendData(currentCommand);
         break;
     case Protocol::Replies::STOP_Y:
-        labGetPosY->setText(valYToString(reply.val));
+        qDebug() << "Get: Replies::STOP_Y" << reply.val;
+        labGetPosY->setText(valToStr.valYToString(reply.val));
         moveTimer.stop();
         break;
     default:

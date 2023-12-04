@@ -53,11 +53,11 @@ void Eth::init_phy() {
 
     RCC_PLL3Cmd(DISABLE);
     // for 8 MHz quarz
-    RCC_PREDIV2Config(RCC_PREDIV2_Div2);
-    RCC_PLL3Config(RCC_PLL3Mul_15);
-    // for 24 MHz quarz
-    //RCC_PREDIV2Config(RCC_PREDIV2_Div6);
+    //RCC_PREDIV2Config(RCC_PREDIV2_Div2);
     //RCC_PLL3Config(RCC_PLL3Mul_15);
+    // for 24 MHz quarz
+    RCC_PREDIV2Config(RCC_PREDIV2_Div6);
+    RCC_PLL3Config(RCC_PLL3Mul_15);
     
     // RCC_MCOConfig(RCC_MCO_PLL3CLK);
     RCC_PLL3Cmd(ENABLE);

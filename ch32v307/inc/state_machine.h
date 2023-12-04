@@ -19,6 +19,21 @@ class StateMachine {
     void timerReplyTimeout();
     bool IsTimeout = false;
 
+    bool IsCalibrated = false;
+
+
+    enum CalibrationStates{
+        NONE,
+        CAL_X_START,
+        CAL_X,
+        CAL_X_STOP,
+        CAL_Y_START,
+        CAL_Y,
+        CAL_Y_STOP
+    };
+    CalibrationStates currentCalibrationState = CalibrationStates::NONE;
+    void calibrationHandler();
+
     private:
     Udp udp;
     StepX stepX;

@@ -13,7 +13,7 @@ void Interface::sendData(const QByteArray& arr) {
     // if usb ...
 }
 
-void Interface::getData(const Protocol::Command& command) {
+void Interface::sendData(const Protocol::Command& command) {
     // if udp
     currentCommand = command;
     QByteArray arr;
@@ -32,7 +32,7 @@ void Interface::getData(const Protocol::Command& command) {
 void Interface::replyTimeout() {
     IsNotReplied = true;
     // send another time
-    getData(currentCommand);
+    sendData(currentCommand);
 }
 
 void Interface::receiveData(const QByteArray& arr) {

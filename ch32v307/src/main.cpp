@@ -14,7 +14,7 @@
 /* Global Variable */
 uint32_t SystemCoreClock = 144000000;
 //------------- objects in static memory (.data section) ----------------------
-Rcc rcc(8);
+Rcc rcc(24);
 Eth eth(192, 168, 1, 5);
 StateMachine stateMachine;
 //-----------------------------------------------------------------------------

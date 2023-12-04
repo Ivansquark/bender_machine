@@ -30,6 +30,7 @@ class Control : public QWidget {
     void onButAuto();
     void onButPlus();
     void onButMinus();
+    void onButDash();
 
   private:
     QVBoxLayout* layV = new QVBoxLayout;

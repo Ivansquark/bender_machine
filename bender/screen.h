@@ -6,6 +6,7 @@
 #include "keyboard.h"
 #include "programs.h"
 #include "interface.h"
+#include "valtostr.h"
 
 #include <QDialog>
 #include <QHBoxLayout>
@@ -70,8 +71,9 @@ class Screen : public QDialog {
     // QPushButton* butExit = new QPushButton("Exit", this);
 
     //--------------- keyboard variables --------------------------------------
-    QString valXToString(uint32_t val);
-    QString valYToString(uint32_t val);
+    ValToStr valToStr;
+    //QString valXToString(uint32_t val);
+    //QString valYToString(uint32_t val);
     std::unique_ptr<QString> strValX = std::make_unique<QString>("");
     std::unique_ptr<QString> strValY = std::make_unique<QString>("");
     std::unique_ptr<QString> strTempValX = std::make_unique<QString>("000.0");
@@ -105,5 +107,7 @@ class Screen : public QDialog {
     std::unique_ptr<Interface> interface = std::make_unique<Interface>();
     //---------------- timers -------------------------------------------------
     QTimer moveTimer;
+    //---------------- Calibration --------------------------------------------
+    bool IsCalibrated = false;
 };
 #endif // SCREEN_H

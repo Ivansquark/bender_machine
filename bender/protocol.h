@@ -19,6 +19,7 @@ enum Commands {
     SEND_Y_MINUS,
     SEND_X_PLUS,
     SEND_X_MINUS,
+    SEND_CALIBRATION,
     REPLY_PC
 };
 
@@ -35,6 +36,9 @@ enum Replies {
     LIMIT_X_MINUS,
     STOP_X,
     STOP_Y,
+    CALIBRATION_START,
+    CALIBRATION_X_STOP,
+    CALIBRATION_Y_STOP,
     REPLY_CONTROLLER
 };
 #pragma pack(push, 1)

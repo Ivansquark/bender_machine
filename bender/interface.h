@@ -15,7 +15,7 @@ class Interface : public QObject {
     Protocol::Command currentCommand;
     Protocol::Reply currentReply;
 
-    void getData(const Protocol::Command& command);
+    void sendData(const Protocol::Command& command);
   signals:
     void sendCurrentReply(const Protocol::Reply& reply);
   private slots:
