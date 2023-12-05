@@ -67,7 +67,7 @@ static err_t low_level_output(struct netif* netif, struct pbuf* p) {
     }
 
     if (!Eth::ETH_TxPkt_ChainMode(len)) {
-        printf("Send failed.\n");
+        //printf("Send failed.\n");
     } else {
         net_data_led_require = 1;
     }

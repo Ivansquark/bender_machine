@@ -54,10 +54,10 @@ class Screen : public QDialog {
   private:
     void addSymbol(char sym);
     QLabel* labSetPosY = new QLabel("SetY", this);
-    QLabel* labPosY = new QLabel("Y", this);
+    QLabel* labPosY = new QLabel("NEED CALIBRATION, \nY", this);
     QLabel* labGetPosY = new QLabel("GetY", this);
     QLabel* labSetPosX = new QLabel("SetX", this);
-    QLabel* labPosX = new QLabel("X", this);
+    QLabel* labPosX = new QLabel("\nX", this);
     QLabel* labGetPosX = new QLabel("GetX", this);
 
     QVBoxLayout* layVleftY = new QVBoxLayout();
@@ -88,6 +88,7 @@ class Screen : public QDialog {
         Y
     };
     XorY currentXorY = XorY::NONE;
+    bool IsPlusOrMinusX = false;
     //---------------- Programs -----------------------------------------------
     Programs* programs = new Programs(this);
     Fileops::Pmode currentPmode = Fileops::Pmode1;
@@ -95,6 +96,8 @@ class Screen : public QDialog {
     Fileops::Pauto currentPauto = Fileops::MANUAL;
     uint32_t currentY = 0;
     uint32_t currentX = 0;
+    uint32_t currentGetY = 0;
+    uint32_t currentGetX = 0;
     void getYX();
     //---------------- Control ------------------------------------------------
     Control* control = new Control(this);

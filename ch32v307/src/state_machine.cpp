@@ -2,7 +2,11 @@
 
 StateMachine* StateMachine::pThis = nullptr;
 
-StateMachine::StateMachine() { pThis = this; }
+StateMachine::StateMachine() {
+    pThis = this;
+    stepX.stop();
+    stepY.stop();
+}
 
 void StateMachine::handler() {
     //--------------  receive handler  ----------------------------------------
@@ -43,7 +47,7 @@ void StateMachine::handler() {
         stepX.handler();
         stepY.handler();
     } else {
-        // TODO:calibration handler
+        calibrationHandler();
     }
     //--------------  tablo handler  ------------------------------------------
     if ((stepX.currentState == StepX::STOP) &&
@@ -55,13 +59,15 @@ void StateMachine::handler() {
         // TODO: reset tablo
     }
     //--------------  send handler  -------------------------------------------
-    if (udp.MustSend) {
-        udp.MustSend = false;
-        udp.MustResend = false;
-        // send last reply
-        udp.sendData(udp.reply);
-        udp.WaitForReply = true;
-        timerReplyStart(100);
+    if (!udp.WaitForReply) {
+        if (udp.MustSend) {
+            udp.MustSend = false;
+            udp.MustResend = false;
+            // send last reply
+            udp.sendData(udp.reply);
+            udp.WaitForReply = true;
+            timerReplyStart(100);
+        }
     }
     //--------------  resend handler  -----------------------------------------
     if (udp.MustResend) {
@@ -72,7 +78,7 @@ void StateMachine::handler() {
         timerReplyStart(100);
     }
 }
-
+//------------------- parse received data -------------------------------------
 void StateMachine::parse() {
     switch (udp.receiveCommand.currentCommand) {
     case Protocol::SEND_START_X:
@@ -112,7 +118,7 @@ void StateMachine::parse() {
         stepX.currentState = StepX::START_MOVING;
         break;
     case Protocol::SEND_CALIBRATION:
-        if(!IsCalibrated) {
+        if (!IsCalibrated) {
             currentCalibrationState = CalibrationStates::CAL_X_START;
         }
         break;
@@ -130,28 +136,33 @@ void StateMachine::calibrationHandler() {
         udp.MustSend = true;
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_START;
         stepX.startMinus();
-        //TODO: check speed
+        currentCalibrationState = CAL_X;
+        // TODO: check speed
         break;
     case CAL_X:
-        if(stepX.getLimitMinus()) {
+        if (stepX.getLimitMinus()) {
             stepX.stop();
             stepX.currentValue = 0;
             stepX.clearPwmCounter();
+            currentCalibrationState = CAL_X_STOP;
         }
         break;
     case CAL_X_STOP:
         udp.MustSend = true;
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_X_STOP;
         udp.reply.val = stepX.currentValue;
+        currentCalibrationState = CAL_Y_START;
         break;
     case CAL_Y_START:
         stepY.startMinus();
+        currentCalibrationState = CAL_Y;
         break;
     case CAL_Y:
-        if(stepY.getLimitMinus()) {
+        if (stepY.getLimitMinus()) {
             stepY.stop();
             stepY.currentValue = 0;
             stepY.clearPwmCounter();
+            currentCalibrationState = CAL_Y_STOP;
         }
         break;
     case CAL_Y_STOP:
@@ -159,6 +170,7 @@ void StateMachine::calibrationHandler() {
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_Y_STOP;
         udp.reply.val = stepY.currentValue;
         IsCalibrated = true;
+        currentCalibrationState = NONE;
         break;
     default:
         break;

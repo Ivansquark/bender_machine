@@ -26,6 +26,7 @@ void StepY::stop() {
 }
 
 void StepY::handler() {
+    currentValue = pwm.counterY / koeff;
     switch (currentState) {
     case STOP:
         break;
@@ -134,6 +135,7 @@ void StepX::stop() {
 }
 
 void StepX::handler() {
+    currentValue = pwm.counterX / koeff;
     switch (currentState) {
     case STOP:
         break;

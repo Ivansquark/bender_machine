@@ -28,7 +28,6 @@ void Interface::sendData(const Protocol::Command& command) {
     // if usb ...
 }
 
-
 void Interface::replyTimeout() {
     IsNotReplied = true;
     // send another time
@@ -38,7 +37,12 @@ void Interface::replyTimeout() {
 void Interface::receiveData(const QByteArray& arr) {
     // parse data
     currentReply.currentReply = (Protocol::Replies)arr[1];
-    currentReply.val = (arr[2] << 24) | (arr[3] << 16) | (arr[3] << 8) | arr[4];
+    currentReply.val =
+        (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
+                   ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
+    if (currentReply.val > 99999) {
+        qDebug() << (uint8_t)arr[2];
+    }
     if (currentReply.currentReply == Protocol::Replies::REPLY_CONTROLLER) {
         IsNotReplied = false;
         timerReply.stop();
@@ -52,7 +56,7 @@ void Interface::sendReply() {
     QByteArray arr;
     arr.append(Protocol::TO);
     arr.append(Protocol::Commands::REPLY_PC);
-    for(int i = 0; i < 4; i++) {
+    for (int i = 0; i < 4; i++) {
         arr.append((char)0);
     }
     udp->sendDataToUdp(arr);

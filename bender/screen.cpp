@@ -94,18 +94,22 @@ void Screen::init() {
     });
     connect(control, &Control::onButPlus, [this] {
         if (currentXorY == XorY::Y) {
+            currentCommand.val = currentY;
             currentCommand.currentCommand = Protocol::Commands::SEND_Y_PLUS;
             interface->sendData(currentCommand);
         } else if (currentXorY == XorY::X) {
+            currentCommand.val = currentX;
             currentCommand.currentCommand = Protocol::Commands::SEND_X_PLUS;
             interface->sendData(currentCommand);
         }
     });
     connect(control, &Control::onButMinus, [this] {
         if (currentXorY == XorY::Y) {
+            currentCommand.val = currentY;
             currentCommand.currentCommand = Protocol::Commands::SEND_Y_MINUS;
             interface->sendData(currentCommand);
         } else if (currentXorY == XorY::X) {
+            currentCommand.val = currentX;
             currentCommand.currentCommand = Protocol::Commands::SEND_X_MINUS;
             interface->sendData(currentCommand);
         }
@@ -322,11 +326,27 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         currentCommand.currentCommand = Protocol::SEND_START_Y;
         currentCommand.val = currentY;
         interface->sendData(currentCommand);
+        if (currentXorY == XorY::X) {
+            currentX = reply.val;
+            labSetPosX->setStyleSheet(Style::TextFinal);
+            labSetPosX->setText(valToStr.valXToString(currentX));
+        }
         break;
     case Protocol::Replies::STOP_Y:
         qDebug() << "Get: Replies::STOP_Y" << reply.val;
         labGetPosY->setText(valToStr.valYToString(reply.val));
-        moveTimer.stop();
+        break;
+    case Protocol::Replies::CALIBRATION_START:
+        qDebug() << "CALIBRATION_START" << reply.val;
+        labPosY->setText("Calibration X started\nY");
+        break;
+    case Protocol::Replies::CALIBRATION_X_STOP:
+        qDebug() << "Get: Replies::CALIBRATION_X_STOP" << reply.val;
+        labPosY->setText("Calibration Y started\nY");
+        break;
+    case Protocol::Replies::CALIBRATION_Y_STOP:
+        qDebug() << "Get: Replies::CALIBRATION_Y_STOP" << reply.val;
+        labPosY->setText("Calibration OK\nY");
         break;
     default:
         break;

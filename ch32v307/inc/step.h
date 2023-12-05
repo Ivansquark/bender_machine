@@ -31,10 +31,13 @@ class StepY {
 
     void handler();
 
-    inline bool getLimitPlus() { return zerro.getState(); }
-    inline bool getLimitMinus() { return konc.getState(); }
+    inline bool getLimitPlus() { return !konc.getState(); }
+    inline bool getLimitMinus() { return !zerro.getState(); }
 
     inline void clearPwmCounter() {pwm.counterY = 0;}
+
+    uint32_t koeff = KOEFF_PWM_TO_MM;
+    static constexpr uint32_t KOEFF_PWM_TO_MM = 100;
 
   private:
     // void init();
@@ -83,25 +86,29 @@ class StepX {
 
     void handler();
     
-    inline bool getLimitPlus() { return konc.getState(); }
-    inline bool getLimitMinus() { return zerro.getState(); }
+    inline bool getLimitPlus() { return !konc.getState(); }
+    inline bool getLimitMinus() { return !zerro.getState(); }
 
     inline void clearPwmCounter() {pwm.counterX = 0;}
 
+    uint32_t koeff = KOEFF_PWM_TO_MM;
+    static constexpr uint32_t KOEFF_PWM_TO_MM = 100;
   private:
     void init();
 
-    inline void enableOn() { en.setHigh(); }
-    inline void enableOff() { en.setLow(); }
+    inline void enableOn() { en.setLow(); }
+    inline void enableOff() { en.setHigh(); }
     inline void dirOn() { dir.setHigh(); }
     inline void dirOff() { dir.setLow(); }
 
     Pwm pwm;
-    Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> en;
-    Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> dir;
+    //Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> en;
+    //Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> dir;
+    Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> dir;
+    Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> en;
     Gpios::In<Gpios::PE, 14, Gpios::InitModeIn::FLOATING> err;
     Gpios::In<Gpios::PE, 2, Gpios::InitModeIn::FLOATING> zerro;
     Gpios::In<Gpios::PE, 4, Gpios::InitModeIn::FLOATING> otstup;
-    Gpios::In<Gpios::PE, 5, Gpios::InitModeIn::FLOATING> konc;
+    Gpios::In<Gpios::PE, 6, Gpios::InitModeIn::FLOATING> konc;
 };
 #endif // STEPH

@@ -1,11 +1,13 @@
 #include "valtostr.h"
-
+#include <cassert>
 ValToStr::ValToStr()
 {
 
 }
 
 QString ValToStr::valXToString(uint32_t val) {
+    if(val > 9999) return "9999";
+    //assert("BIG VAL" && val < 9999);
     QString str = "";
     int count = 0;
     uint8_t arr[4] = {0};
@@ -40,6 +42,8 @@ QString ValToStr::valXToString(uint32_t val) {
     return str;
 }
 QString ValToStr::valYToString(uint32_t val) {
+    if(val > 9999) return "9999";
+    //assert(val < 99999);
     QString str = "";
     int count = 0;
     uint8_t arr[5] = {0};
