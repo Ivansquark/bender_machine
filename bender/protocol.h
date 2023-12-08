@@ -21,6 +21,8 @@ enum Commands {
     SEND_X_MINUS,
     SEND_CALIBRATION_START,
     SEND_CALIBRATION_STOP,
+    SEND_GET_SETTINGS,
+    SEND_SET_SETTINGS,
     REPLY_PC
 };
 
@@ -40,6 +42,8 @@ enum Replies {
     CALIBRATION_START,
     CALIBRATION_X_STOP,
     CALIBRATION_Y_STOP,
+    SETTINGS,
+    NEED_CALIBRATION,
     REPLY_CONTROLLER
 };
 #pragma pack(push, 1)
@@ -50,6 +54,22 @@ struct Command {
 struct Reply {
     Replies currentReply;
     uint32_t val;
+};
+
+struct CommandSet {
+    Commands currentCommand;
+    uint32_t coefY;
+    uint32_t coefX;
+    uint32_t deviationY;
+    uint32_t deviationX;
+};
+
+struct ReplySet {
+    Replies currentReply;
+    uint32_t coefY;
+    uint32_t coefX;
+    uint32_t deviationY;
+    uint32_t deviationX;
 };
 #pragma pack(pop)
 

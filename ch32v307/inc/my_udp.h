@@ -27,6 +27,9 @@ class Udp {
 
     Protocol::Command receiveCommand{Protocol::Commands::ERROR, 0};
     Protocol::Reply reply{Protocol::Replies::CURRENT_X, 0};
+    Protocol::CommandSet receiveCommandSet{Protocol::Commands::ERROR, 0, 0, 0,
+                                           0};
+    Protocol::ReplySet replySet{Protocol::Replies::SETTINGS, 0, 0, 0, 0};
 
     bool WaitForReply = false;
     bool MustSendReply = false;
@@ -36,6 +39,7 @@ class Udp {
 
     void sendReply();
     void sendData(Protocol::Reply reply);
+    void sendDataSet(Protocol::ReplySet replySet);
 
   private:
     void init();

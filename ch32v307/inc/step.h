@@ -36,8 +36,10 @@ class StepY {
 
     inline void clearPwmCounter() {pwm.counterY = 0;}
 
-    uint32_t koeff = KOEFF_PWM_TO_MM;
-    static constexpr uint32_t KOEFF_PWM_TO_MM = 100;
+    uint32_t coeff = COEFF_PWM_TO_MM;
+    static constexpr uint32_t COEFF_PWM_TO_MM = 100;
+    uint32_t deviation = COEFF_PWM_TO_MM;
+    static constexpr uint32_t DEVIATION = 10;
 
   private:
     // void init();
@@ -93,8 +95,11 @@ class StepX {
 
     inline void clearPwmCounter() {pwm.counterX = 0;}
 
-    uint32_t koeff = KOEFF_PWM_TO_MM;
-    static constexpr uint32_t KOEFF_PWM_TO_MM = 100;
+    uint32_t coeff = COEFF_PWM_TO_MM;
+    static constexpr uint32_t COEFF_PWM_TO_MM = 100;
+    uint32_t deviation = COEFF_PWM_TO_MM;
+    static constexpr uint32_t DEVIATION = 10;
+
   private:
     void init();
 

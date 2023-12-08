@@ -17,6 +17,7 @@ SOURCES += \
     programs.cpp \
     protocol.cpp \
     screen.cpp \
+    settings.cpp \
     uart.cpp \
     udp.cpp \
     valtostr.cpp
@@ -29,6 +30,7 @@ HEADERS += \
     programs.h \
     protocol.h \
     screen.h \
+    settings.h \
     style.h \
     uart.h \
     udp.h \

@@ -45,12 +45,18 @@ void Udp::receive_Local_callback(void*, [[maybe_unused]] struct udp_pcb* upcb,
     // Set current interface to UDP
 
     Udp::pThis->receiveCommand.currentCommand = Protocol::ERROR;
-    Udp::pThis->receiveCommand = Protocol::parseFrame(udp_msg_receive, pLen);
-
-    pbuf_free(p);
-    if (Udp::pThis->receiveCommand.currentCommand != Protocol::ERROR) {
+    if (udp_msg_receive[1] == Protocol::Commands::SEND_SET_SETTINGS) {
+        Udp::pThis->receiveCommandSet =
+            Protocol::parseFrameSet(udp_msg_receive, pLen);
         Udp::pThis->IsDataReceived = true;
+    } else {
+        Udp::pThis->receiveCommand =
+            Protocol::parseFrame(udp_msg_receive, pLen);
+        if (Udp::pThis->receiveCommand.currentCommand != Protocol::ERROR) {
+            Udp::pThis->IsDataReceived = true;
+        }
     }
+    pbuf_free(p);
 }
 
 void Udp::sendToPC(const uint8_t* buff, uint8_t len) {
@@ -74,6 +80,29 @@ void Udp::sendData(Protocol::Reply reply) {
         (uint8_t)(reply.val >> 16),
         (uint8_t)(reply.val >> 8),
         (uint8_t)(reply.val),
+    };
+    sendToPC(arr, sizeof(arr));
+}
+void Udp::sendDataSet(Protocol::ReplySet replySet) {
+    uint8_t arr[] = {
+        Protocol::FROM,
+        (uint8_t)replySet.currentReply,
+        (uint8_t)(replySet.coefY >> 24),
+        (uint8_t)(replySet.coefY >> 16),
+        (uint8_t)(replySet.coefY >> 8),
+        (uint8_t)(replySet.coefY),
+        (uint8_t)(replySet.coefX >> 24),
+        (uint8_t)(replySet.coefX >> 16),
+        (uint8_t)(replySet.coefX >> 8),
+        (uint8_t)(replySet.coefX),
+        (uint8_t)(replySet.deviationY >> 24),
+        (uint8_t)(replySet.deviationY >> 16),
+        (uint8_t)(replySet.deviationY >> 8),
+        (uint8_t)(replySet.deviationY),
+        (uint8_t)(replySet.deviationX >> 24),
+        (uint8_t)(replySet.deviationX >> 16),
+        (uint8_t)(replySet.deviationX >> 8),
+        (uint8_t)(replySet.deviationX),
     };
     sendToPC(arr, sizeof(arr));
 }

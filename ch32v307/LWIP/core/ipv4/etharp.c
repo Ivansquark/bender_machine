@@ -1063,7 +1063,7 @@ etharp_query(struct netif *netif, const ip4_addr_t *ipaddr, struct pbuf *q)
           memp_free(MEMP_ARP_QUEUE, old);
         }
 #endif
-        LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_query: queued packet %p on ARP entry %"U16_F"\n", (void *)q, i));
+        //LWIP_DEBUGF(ETHARP_DEBUG | LWIP_DBG_TRACE, ("etharp_query: queued packet %p on ARP entry %"U16_F"\n", (void *)q, i));
         result = ERR_OK;
       } else {
         /* the pool MEMP_ARP_QUEUE is empty */

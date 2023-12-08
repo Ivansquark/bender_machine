@@ -14,10 +14,14 @@ class Interface : public QObject {
     Interface(QObject* parent = nullptr);
     Protocol::Command currentCommand;
     Protocol::Reply currentReply;
+    Protocol::CommandSet currentCommandSet;
+    Protocol::ReplySet currentReplySet;
 
     void sendData(const Protocol::Command& command);
+    void sendDataSettings(const Protocol::ReplySet& command);
   signals:
     void sendCurrentReply(const Protocol::Reply& reply);
+    void sendCurrentReplySet(const Protocol::ReplySet& reply);
   private slots:
     void replyTimeout();
   public slots:

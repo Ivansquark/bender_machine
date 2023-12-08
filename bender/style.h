@@ -41,6 +41,9 @@ constexpr const char* ButStartPressed =
 constexpr const char* ButStartReleased =
     "QPushButton{background-color:green; font-size:25px;}";
 
+constexpr const char* SpinSettings =
+    "QSpinBox::down-button{width: 40} QSpinBox::up-button{width: 40}";
+
 } // namespace Style
 
 #endif // STYLE_H

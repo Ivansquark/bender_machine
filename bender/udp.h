@@ -23,7 +23,7 @@ class Udp : public QObject {
     static constexpr uint16_t MCU_PORT = 4000;
     static constexpr uint16_t LOCAL_PORT = 4001;
     static constexpr const char* IP_MCU = "192.168.1.5";
-
+    std::unique_ptr<QByteArray> bArr = std::make_unique<QByteArray>();
 
 };
 

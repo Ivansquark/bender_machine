@@ -6,6 +6,7 @@
 #include "interface.h"
 #include "keyboard.h"
 #include "programs.h"
+#include "settings.h"
 #include "valtostr.h"
 
 #include <QDialog>
@@ -13,9 +14,9 @@
 #include <QLabel>
 #include <QMouseEvent>
 #include <QPushButton>
+#include <QThread>
 #include <QVBoxLayout>
 #include <memory.h>
-#include <QThread>
 
 class Screen : public QDialog {
     Q_OBJECT
@@ -119,8 +120,8 @@ class Screen : public QDialog {
     Protocol::Reply currentReply;
     std::unique_ptr<Interface> interface = std::make_unique<Interface>();
     //---------------- timers -------------------------------------------------
-    //QTimer moveTimer;
-    //QTimer* timerWaitForPress;
+    // QTimer moveTimer;
+    // QTimer* timerWaitForPress;
     std::unique_ptr<QTimer> timerWaitForPress = std::make_unique<QTimer>();
     std::unique_ptr<QTimer> timerForAutoSend = std::make_unique<QTimer>();
     std::unique_ptr<QTimer> timerWaitForSaveInFile = std::make_unique<QTimer>();
@@ -134,6 +135,9 @@ class Screen : public QDialog {
     void setManualMoovement(bool state);
     bool IsPlusPressed = false;
     bool IsMinusPressed = false;
+
+    //---------------- Settings -----------------------------------------------
+    std::unique_ptr<Settings> set = std::make_unique<Settings>(this);
 
     //---------------- Mouse handling -----------------------------------------
   protected:

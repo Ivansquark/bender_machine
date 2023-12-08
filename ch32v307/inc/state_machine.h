@@ -21,6 +21,7 @@ class StateMachine {
 
     bool IsCalibrated = false;
 
+    bool IsMustReplySettings = false;
 
     enum CalibrationStates{
         NONE,

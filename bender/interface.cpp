@@ -28,6 +28,33 @@ void Interface::sendData(const Protocol::Command& command) {
     // if usb ...
 }
 
+void Interface::sendDataSettings(const Protocol::ReplySet& data) {
+    // if udp
+    currentReplySet = data;
+    QByteArray arr;
+    arr.append(Protocol::TO);
+    arr.append((uint8_t)currentReplySet.currentReply);
+    arr.append((uint8_t)(currentReplySet.coefY >> 24));
+    arr.append((uint8_t)(currentReplySet.coefY >> 16));
+    arr.append((uint8_t)(currentReplySet.coefY >> 8));
+    arr.append((uint8_t)(currentReplySet.coefY));
+    arr.append((uint8_t)(currentReplySet.coefX >> 24));
+    arr.append((uint8_t)(currentReplySet.coefX >> 16));
+    arr.append((uint8_t)(currentReplySet.coefX >> 8));
+    arr.append((uint8_t)(currentReplySet.coefX));
+    arr.append((uint8_t)(currentReplySet.deviationY >> 24));
+    arr.append((uint8_t)(currentReplySet.deviationY >> 16));
+    arr.append((uint8_t)(currentReplySet.deviationY >> 8));
+    arr.append((uint8_t)(currentReplySet.deviationY));
+    arr.append((uint8_t)(currentReplySet.deviationX >> 24));
+    arr.append((uint8_t)(currentReplySet.deviationX >> 16));
+    arr.append((uint8_t)(currentReplySet.deviationX >> 8));
+    arr.append((uint8_t)(currentReplySet.deviationX));
+    udp->sendDataToUdp(arr);
+    timerReply.start(100);
+    // if usb ...
+}
+
 void Interface::replyTimeout() {
     IsNotReplied = true;
     // send another time
@@ -36,17 +63,34 @@ void Interface::replyTimeout() {
 
 void Interface::receiveData(const QByteArray& arr) {
     // parse data
-    currentReply.currentReply = (Protocol::Replies)arr[1];
-    currentReply.val =
-        (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
-                   ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
-    if (currentReply.val > 99999) {
-        qDebug() << (uint8_t)arr[2];
-    }
-    if (currentReply.currentReply == Protocol::Replies::REPLY_CONTROLLER) {
+    if (arr[1] == Protocol::Replies::SETTINGS) {
+        currentReplySet.currentReply = (Protocol::Replies)arr[1];
+        currentReplySet.coefY =
+            (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
+                       ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
+        currentReplySet.coefX =
+            (uint32_t)(((uint8_t)arr[6] << 24) | ((uint8_t)arr[7] << 16) |
+                       ((uint8_t)arr[8] << 8) | (uint8_t)arr[9]);
+        currentReplySet.deviationY =
+            (uint32_t)(((uint8_t)arr[10] << 24) | ((uint8_t)arr[11] << 16) |
+                       ((uint8_t)arr[12] << 8) | (uint8_t)arr[13]);
+        currentReplySet.deviationX =
+            (uint32_t)(((uint8_t)arr[14] << 24) | ((uint8_t)arr[15] << 16) |
+                       ((uint8_t)arr[16] << 8) | (uint8_t)arr[17]);
+        sendReply();
+        emit sendCurrentReplySet(currentReplySet);
+
+    } else if (arr[1] == Protocol::Replies::REPLY_CONTROLLER) {
         IsNotReplied = false;
         timerReply.stop();
     } else {
+        currentReply.currentReply = (Protocol::Replies)arr[1];
+        currentReply.val =
+            (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
+                       ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
+        if (currentReply.val > 99999) {
+            qDebug() << (uint8_t)arr[2];
+        }
         sendReply();
         emit sendCurrentReply(currentReply);
     }

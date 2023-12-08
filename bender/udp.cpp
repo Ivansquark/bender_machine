@@ -18,14 +18,15 @@ void Udp::readDatagrammGet() {
     uint16_t sizeDatagram = udpSocketGet->pendingDatagramSize();
     char arr[6];
     udpSocketGet->readDatagram(arr, sizeDatagram, &senderIP);
-    QByteArray bArr;
-    qDebug() << bArr.data();
+    //QByteArray bArr;
+    qDebug() << bArr->data();
 //    QString data;
     for (int i = 0; i < sizeDatagram; i++) {
-        bArr.append(arr[i]);
+        bArr->append(arr[i]);
     }
     // emit signal
-    emit sendData(bArr);
+    emit sendData(*bArr);
+    bArr->clear();
 }
 void Udp::sendDataToUdp(const QByteArray& bytes) {
     udpSocketSend->writeDatagram(bytes, QHostAddress(IP_MCU), MCU_PORT);

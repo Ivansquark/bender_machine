@@ -21,6 +21,8 @@ enum Commands {
     SEND_X_MINUS,
     SEND_CALIBRATION_START,
     SEND_CALIBRATION_STOP,
+    SEND_GET_SETTINGS,
+    SEND_SET_SETTINGS,
     REPLY_PC,
     ERROR
 };
@@ -41,6 +43,8 @@ enum Replies {
     CALIBRATION_START,
     CALIBRATION_X_STOP,
     CALIBRATION_Y_STOP,
+    SETTINGS,
+    NEED_CALIBRATION,   // first command
     REPLY_CONTROLLER
 };
 #pragma pack(push, 1)
@@ -52,6 +56,23 @@ struct Reply {
     Replies currentReply;
     uint32_t val;
 };
+
+struct CommandSet {
+    Commands currentCommand;
+    uint32_t coefY;
+    uint32_t coefX;
+    uint32_t deviationY;
+    uint32_t deviationX;
+};
+
+struct ReplySet {
+    Replies currentReply;
+    uint32_t coefY;
+    uint32_t coefX;
+    uint32_t deviationY;
+    uint32_t deviationX;
+};
+
 #pragma pack(pop)
 
 // send
@@ -75,6 +96,7 @@ struct Reply {
 // 7 - CS_LOW
 
 Command parseFrame(uint8_t*, uint8_t);
+CommandSet parseFrameSet(uint8_t*, uint8_t);
 uint16_t crc16(uint8_t* data, uint8_t len);
 
 } // namespace Protocol

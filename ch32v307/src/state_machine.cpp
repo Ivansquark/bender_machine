@@ -6,6 +6,9 @@ StateMachine::StateMachine() {
     pThis = this;
     stepX.stop();
     stepY.stop();
+    udp.WaitForReply = false;
+    // udp.reply.currentReply = Protocol::Replies::NEED_CALIBRATION;
+    // udp.MustSend = true;
 }
 
 void StateMachine::handler() {
@@ -23,7 +26,7 @@ void StateMachine::handler() {
         if (udp.receiveCommand.currentCommand == Protocol::Commands::REPLY_PC) {
             udp.WaitForReply = false;
             udp.MustResend = false;
-            //udp.MustSend = false;
+            // udp.MustSend = false;
             timerReplyStop();
         }
         // if (udp.WaitForReply) {
@@ -64,7 +67,12 @@ void StateMachine::handler() {
             udp.MustSend = false;
             udp.MustResend = false;
             // send last reply
-            udp.sendData(udp.reply);
+            if (IsMustReplySettings) {
+                IsMustReplySettings = false;
+                udp.sendDataSet(udp.replySet);
+            } else {
+                udp.sendData(udp.reply);
+            }
             udp.WaitForReply = true;
             timerReplyStart(100);
         }
@@ -128,6 +136,15 @@ void StateMachine::parse() {
             stepX.stop();
             stepY.stop();
         }
+        break;
+    case Protocol::SEND_GET_SETTINGS:
+        udp.MustSend = true;
+        udp.replySet.currentReply = Protocol::SETTINGS;
+        udp.replySet.coefY = stepY.coeff;
+        udp.replySet.coefX = stepX.coeff;
+        udp.replySet.deviationY = stepY.deviation;
+        udp.replySet.deviationX = stepX.deviation;
+        IsMustReplySettings = true;
         break;
     default:
         break;
