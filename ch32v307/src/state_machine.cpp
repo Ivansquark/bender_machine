@@ -23,7 +23,7 @@ void StateMachine::handler() {
         if (udp.receiveCommand.currentCommand == Protocol::Commands::REPLY_PC) {
             udp.WaitForReply = false;
             udp.MustResend = false;
-            udp.MustSend = false;
+            //udp.MustSend = false;
             timerReplyStop();
         }
         // if (udp.WaitForReply) {
@@ -117,9 +117,16 @@ void StateMachine::parse() {
         stepX.stopValue = udp.receiveCommand.val;
         stepX.currentState = StepX::START_MOVING;
         break;
-    case Protocol::SEND_CALIBRATION:
+    case Protocol::SEND_CALIBRATION_START:
         if (!IsCalibrated) {
             currentCalibrationState = CalibrationStates::CAL_X_START;
+        }
+        break;
+    case Protocol::SEND_CALIBRATION_STOP:
+        if (!IsCalibrated) {
+            currentCalibrationState = CalibrationStates::NONE;
+            stepX.stop();
+            stepY.stop();
         }
         break;
     default:

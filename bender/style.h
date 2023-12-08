@@ -6,6 +6,8 @@ constexpr const char* TextTemp =
     "QLabel{color:yellow; background-color:grey; font-size:40px;}";
 constexpr const char* TextFinal =
     "QLabel{color:red; background-color:grey; font-size:40px;}";
+constexpr const char* TextMove =
+    "QLabel{color:red; background-color:blue; font-size:40px;}";
 
 constexpr const char* ButPressed =
     "QPushButton{background-color:red; font-size:25px;}";

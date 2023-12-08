@@ -20,6 +20,29 @@ void Control::setStart(bool state) {
     }
 }
 
+void Control::setEnabledCalibration(bool state) {
+    radioP1->setEnabled(!state);
+    radioP2->setEnabled(!state);
+    butManual->setEnabled(!state);
+    butAuto->setEnabled(!state);
+    butSemiAuto->setEnabled(!state);
+    butStart->setEnabled(!state);
+    butPlus->setEnabled(!state);
+    butMinus->setEnabled(!state);
+    butDash->setEnabled(state);
+}
+
+void Control::setManualMoovement(bool state) {
+    radioP1->setEnabled(!state);
+    radioP2->setEnabled(!state);
+    butManual->setEnabled(!state);
+    butAuto->setEnabled(!state);
+    butSemiAuto->setEnabled(!state);
+    butStart->setEnabled(!state);
+    butPlus->setEnabled(state);
+    butMinus->setEnabled(state);
+}
+
 void Control::init() {
     layH1->addWidget(radioP1);
     layH1->addWidget(radioP2);
@@ -91,9 +114,19 @@ void Control::init() {
         emit onButAuto();
         setPauto(Fileops::AUTO);
     });
-    connect(butPlus, &QPushButton::clicked, [this] { emit onButPlus(); });
-    connect(butMinus, &QPushButton::clicked, [this] { emit onButMinus(); });
-    connect(butDash, &QPushButton::clicked, [this] { emit onButDash(); });
+    connect(butPlus, &QPushButton::pressed,
+            [this] { emit onButPlusPressed(); });
+    connect(butPlus, &QPushButton::released,
+            [this] { emit onButPlusReleased(); });
+    connect(butMinus, &QPushButton::pressed,
+            [this] { emit onButMinusPressed(); });
+    connect(butMinus, &QPushButton::released,
+            [this] { emit onButMinusReleased(); });
+    connect(butDash, &QPushButton::pressed,
+            [this] { emit onButDashPressed(); });
+    connect(butDash, &QPushButton::released,
+            [this] { emit onButDashReleased(); });
+    // connect(butDash, &QPushButton::pressed, [this] { emit onButDash(); });
 }
 
 void Control::setPmode(Fileops::Pmode mode) {

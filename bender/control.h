@@ -15,6 +15,8 @@ class Control : public QWidget {
     explicit Control(QWidget* parent = nullptr);
     ~Control();
     void setStart(bool state);
+    void setEnabledCalibration(bool state);
+    void setManualMoovement(bool state);
 
   private:
     void init();
@@ -28,9 +30,12 @@ class Control : public QWidget {
     void onButManual();
     void onButSemiAuto();
     void onButAuto();
-    void onButPlus();
-    void onButMinus();
-    void onButDash();
+    void onButPlusPressed();
+    void onButPlusReleased();
+    void onButMinusPressed();
+    void onButMinusReleased();
+    void onButDashPressed();
+    void onButDashReleased();
 
   private:
     QVBoxLayout* layV = new QVBoxLayout;

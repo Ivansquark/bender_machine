@@ -27,9 +27,9 @@ void Pwm::init() {
     TIM1->CHCTLR1 &= ~TIM_CC1S;
     TIM1->CCER |= TIM_CC1NE;  //| TIM_CCER_CC3NP; //signal on correponding pin
     TIM1->CCER &= ~TIM_CC1NP; // no inverting //active high
-    //TIM1->PSC = 18 - 1;        // TIM clk = 144000000  (clk APB2) => 8 MHz
-    // auto reload register 8000000/100 = 80000 Hz frequency
-    TIM1->PSC = 36 - 1;        // TIM clk = 144000000  (clk APB2) => 4 MHz
+    // TIM1->PSC = 18 - 1;        // TIM clk = 144000000  (clk APB2) => 8 MHz
+    //  auto reload register 8000000/100 = 80000 Hz frequency
+    TIM1->PSC = 36 - 1; // TIM clk = 144000000  (clk APB2) => 4 MHz
     // auto reload register 4.000.000/100 = 40.000 Hz frequency
     TIM1->ATRLR = 100 - 1;
     TIM1->CTLR1 |= TIM_ARPE;    // auto reload in register enable
@@ -53,9 +53,9 @@ void Pwm::init() {
     TIM9->CHCTLR2 &= ~TIM_CC3S;
     TIM9->CCER |= TIM_CC3NE;  // signal on correponding pin
     TIM9->CCER &= ~TIM_CC3NP; // no inverting //active high
-    //TIM9->PSC = 18 - 1;        // TIM clk = 144.000.000  (clk APB2) => 8 MHz
-    // auto reload register 8.000.000/100 = 80.000 Hz frequency
-    TIM9->PSC = 36 - 1;        // TIM clk = 144.000.000  (clk APB2) => 4 MHz
+    // TIM9->PSC = 18 - 1;        // TIM clk = 144.000.000  (clk APB2) => 8 MHz
+    //  auto reload register 8.000.000/100 = 80.000 Hz frequency
+    TIM9->PSC = 36 - 1; // TIM clk = 144.000.000  (clk APB2) => 4 MHz
     // auto reload register 4.000.000/100 = 40.000 Hz frequency
     TIM9->ATRLR = 100 - 1;
     TIM9->CTLR1 |= TIM_ARPE;    // auto reload in register enable
@@ -68,8 +68,7 @@ void Pwm::init() {
     // TIM1->CR1 |= TIM_CR1_CEN;
     NVIC_EnableIRQ(TIM9_UP_IRQn); // irq enable
 }
-extern "C" 
-__attribute__((interrupt)) void TIM1_UP_IRQHandler() {
+extern "C" __attribute__((interrupt)) void TIM1_UP_IRQHandler() {
     TIM1->INTFR &= ~TIM_UIF; // drop Update interrupt flag
     if (Pwm::currentDirectionX == Pwm::DirectionX::PLUS) {
         Pwm::counterX++;
@@ -79,8 +78,7 @@ __attribute__((interrupt)) void TIM1_UP_IRQHandler() {
         }
     }
 }
-extern "C" 
-__attribute__((interrupt)) void TIM9_UP_IRQHandler() {
+extern "C" __attribute__((interrupt)) void TIM9_UP_IRQHandler() {
     TIM9->INTFR &= ~TIM_UIF; // drop Update interrupt flag
     if (Pwm::currentDirectionY == Pwm::DirectionY::UP) {
         Pwm::counterY++;

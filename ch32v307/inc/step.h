@@ -42,14 +42,16 @@ class StepY {
   private:
     // void init();
 
-    inline void enableOn() { en.setHigh(); }
-    inline void enableOff() { en.setLow(); }
+    inline void enableOn() { en.setLow(); }
+    inline void enableOff() { en.setHigh(); }
     inline void dirOn() { dir.setHigh(); }
     inline void dirOff() { dir.setLow(); }
 
     Pwm pwm;
-    Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> en;
-    Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> dir;
+    //Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> en;
+    //Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> dir;
+    Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> dir;
+    Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> en;
     Gpios::Out<Gpios::PD, 11, Gpios::InitModeOut::PUSH_PULL> block;
     Gpios::Out<Gpios::PD, 13, Gpios::InitModeOut::PUSH_PULL> tablo;
     Gpios::Out<Gpios::PD, 15, Gpios::InitModeOut::PUSH_PULL> motor_power;

@@ -6,7 +6,7 @@ ValToStr::ValToStr()
 }
 
 QString ValToStr::valXToString(uint32_t val) {
-    if(val > 9999) return "9999";
+    if(val > 9999) return "999.9";
     //assert("BIG VAL" && val < 9999);
     QString str = "";
     int count = 0;
@@ -42,7 +42,7 @@ QString ValToStr::valXToString(uint32_t val) {
     return str;
 }
 QString ValToStr::valYToString(uint32_t val) {
-    if(val > 9999) return "9999";
+    if(val > 99999) return "999.99";
     //assert(val < 99999);
     QString str = "";
     int count = 0;

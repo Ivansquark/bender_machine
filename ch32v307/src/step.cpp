@@ -31,18 +31,22 @@ void StepY::handler() {
     case STOP:
         break;
     case START_MOVING:
-        if (currentValue < stopValue) {
-            startPlus();
+        //if (currentValue < stopValue) {
+        if (pwm.counterY < stopValue * koeff) {
             currentState = MOVING_PLUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_Y;
             Udp::pThis->reply.val = currentValue;
-        } else if (currentValue > stopValue) {
-            startMinus();
+            startPlus();
+            // TODO: block all
+        //} else if (currentValue > stopValue) {
+        } else if (pwm.counterY > stopValue * koeff) {
             currentState = MOVING_MINUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_Y;
             Udp::pThis->reply.val = currentValue;
+            startMinus();
+            // TODO: block all
         } else {
             currentState = STOP;
             Udp::pThis->MustSend = true;
@@ -51,10 +55,12 @@ void StepY::handler() {
         }
         break;
     case MOVING_PLUS:
-        if (currentValue >= stopValue) {
+        //if (currentValue >= stopValue) {
+        if (pwm.counterY >= stopValue * koeff) {
             stop();
             currentState = STOP;
             // send signal about final place
+            currentValue = pwm.counterY / koeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_Y;
             Udp::pThis->reply.val = currentValue;
@@ -78,10 +84,12 @@ void StepY::handler() {
         }
         break;
     case MOVING_MINUS:
-        if (currentValue <= stopValue) {
+        //if (currentValue <= stopValue) {
+        if (pwm.counterX <= stopValue * koeff) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
+            currentValue = pwm.counterY / koeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_Y;
             Udp::pThis->reply.val = currentValue;
@@ -135,23 +143,28 @@ void StepX::stop() {
 }
 
 void StepX::handler() {
-    currentValue = pwm.counterX / koeff;
+    // currentValue = (pwm.counterX) / koeff;
+    currentValue = (pwm.counterX) / koeff;
     switch (currentState) {
     case STOP:
         break;
     case START_MOVING:
-        if (currentValue < stopValue) {
-            startPlus();
+        // if (currentValue < stopValue) {
+        if (pwm.counterX < stopValue * koeff) {
             currentState = MOVING_PLUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_X;
             Udp::pThis->reply.val = currentValue;
-        } else if (currentValue > stopValue) {
-            startMinus();
+            startPlus();
+            // TODO: block all
+            //} else if (currentValue > stopValue) {
+        } else if (pwm.counterX > stopValue * koeff) {
             currentState = MOVING_MINUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_X;
             Udp::pThis->reply.val = currentValue;
+            startMinus();
+            // TODO: block all
         } else {
             currentState = STOP;
             // TODO: send signal about final place
@@ -161,15 +174,16 @@ void StepX::handler() {
         }
         break;
     case MOVING_PLUS:
-        if (currentValue >= stopValue) {
+        if (pwm.counterX >= stopValue * koeff) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
+            currentValue = (pwm.counterX) / koeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_X;
             Udp::pThis->reply.val = currentValue;
         } else {
-            // TODO: send currentValue
+            // send currentValue
             if (previousValue != currentValue) {
                 Udp::pThis->MustSend = true;
                 Udp::pThis->reply.currentReply = Protocol::CURRENT_X;
@@ -188,10 +202,13 @@ void StepX::handler() {
         }
         break;
     case MOVING_MINUS:
-        if (currentValue <= stopValue) {
+        // if (currentValue <= stopValue) {
+        if (pwm.counterX <= stopValue * koeff) {
+            // if (pwm.counterX * koeff >= stopValue) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
+            currentValue = (pwm.counterX) / koeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_X;
             Udp::pThis->reply.val = currentValue;

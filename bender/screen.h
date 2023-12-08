@@ -3,17 +3,19 @@
 
 #include "control.h"
 // #include "fileops.h"
+#include "interface.h"
 #include "keyboard.h"
 #include "programs.h"
-#include "interface.h"
 #include "valtostr.h"
 
 #include <QDialog>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMouseEvent>
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <memory.h>
+#include <QThread>
 
 class Screen : public QDialog {
     Q_OBJECT
@@ -54,10 +56,12 @@ class Screen : public QDialog {
   private:
     void addSymbol(char sym);
     QLabel* labSetPosY = new QLabel("SetY", this);
-    QLabel* labPosY = new QLabel("NEED CALIBRATION, \nY", this);
+    QLabel* labInfoY = new QLabel("NEED CALIBRATION", this);
+    QLabel* labPosY = new QLabel("Y", this);
     QLabel* labGetPosY = new QLabel("GetY", this);
     QLabel* labSetPosX = new QLabel("SetX", this);
-    QLabel* labPosX = new QLabel("\nX", this);
+    QLabel* labInfoX = new QLabel("___", this);
+    QLabel* labPosX = new QLabel("X", this);
     QLabel* labGetPosX = new QLabel("GetX", this);
 
     QVBoxLayout* layVleftY = new QVBoxLayout();
@@ -72,8 +76,8 @@ class Screen : public QDialog {
 
     //--------------- keyboard variables --------------------------------------
     ValToStr valToStr;
-    //QString valXToString(uint32_t val);
-    //QString valYToString(uint32_t val);
+    // QString valXToString(uint32_t val);
+    // QString valYToString(uint32_t val);
     std::unique_ptr<QString> strValX = std::make_unique<QString>("");
     std::unique_ptr<QString> strValY = std::make_unique<QString>("");
     std::unique_ptr<QString> strTempValX = std::make_unique<QString>("000.0");
@@ -82,13 +86,19 @@ class Screen : public QDialog {
     uint32_t y = 0;
     uint8_t symCountX = 0;
     uint8_t symCountY = 0;
-    enum XorY : uint8_t {
+    enum class XorY : uint8_t {
         NONE,
         X,
         Y
     };
     XorY currentXorY = XorY::NONE;
     bool IsPlusOrMinusX = false;
+    enum class MoveXorY : uint8_t {
+        NONE,
+        X,
+        Y
+    };
+    MoveXorY currentMoveXorY = MoveXorY::NONE;
     //---------------- Programs -----------------------------------------------
     Programs* programs = new Programs(this);
     Fileops::Pmode currentPmode = Fileops::Pmode1;
@@ -109,8 +119,25 @@ class Screen : public QDialog {
     Protocol::Reply currentReply;
     std::unique_ptr<Interface> interface = std::make_unique<Interface>();
     //---------------- timers -------------------------------------------------
-    QTimer moveTimer;
+    //QTimer moveTimer;
+    //QTimer* timerWaitForPress;
+    std::unique_ptr<QTimer> timerWaitForPress = std::make_unique<QTimer>();
+    std::unique_ptr<QTimer> timerForAutoSend = std::make_unique<QTimer>();
+    std::unique_ptr<QTimer> timerWaitForSaveInFile = std::make_unique<QTimer>();
+    static constexpr uint32_t TIME_TO_PRESS = 200;
+    static constexpr uint32_t TIME_TO_AUTO_SEND = 5;
+    static constexpr uint32_t TIME_TO_SAVE_IN_FILE = 100;
     //---------------- Calibration --------------------------------------------
     bool IsCalibrated = false;
+    void setCalibrationState(bool state);
+    //---------------- Manual movement ----------------------------------------
+    void setManualMoovement(bool state);
+    bool IsPlusPressed = false;
+    bool IsMinusPressed = false;
+
+    //---------------- Mouse handling -----------------------------------------
+  protected:
+    void mousePressEvent(QMouseEvent* event);
+    void mouseReleaseEvent(QMouseEvent* event);
 };
 #endif // SCREEN_H
