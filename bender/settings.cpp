@@ -3,12 +3,21 @@
 
 Settings::Settings(QWidget* parent) : QDialog{parent} { init(); }
 
-void Settings::setData(const Protocol::ReplySet & val) {
+void Settings::setData(const Protocol::ReplySet& val) {
     currentReplyGet = val;
     spinCoefY->setValue(val.coefY);
     spinCoefX->setValue(val.coefX);
     spinDeviationY->setValue(val.deviationY);
     spinDeviationX->setValue(val.deviationX);
+}
+
+void Settings::firstSendSettings(const Protocol::CommandSet& val) {
+    currentCommandSet.currentCommand = Protocol::Commands::SEND_SET_SETTINGS;
+    currentCommandSet.coefY = val.coefY;
+    currentCommandSet.coefX = val.coefX;
+    currentCommandSet.deviationY = val.deviationY;
+    currentCommandSet.deviationX = val.deviationX;
+    emit sendSetData(currentCommandSet);
 }
 
 void Settings::init() {
@@ -66,7 +75,8 @@ void Settings::init() {
     connect(but9, &QPushButton::clicked, [this] { codeCheck(9); });
 
     connect(butSend, &QPushButton::clicked, [this] {
-        currentCommandSet.currentCommand = Protocol::Commands::SEND_SET_SETTINGS;
+        currentCommandSet.currentCommand =
+            Protocol::Commands::SEND_SET_SETTINGS;
         currentCommandSet.coefY = spinCoefY->value();
         currentCommandSet.coefX = spinCoefX->value();
         currentCommandSet.deviationY = spinDeviationY->value();
@@ -81,6 +91,7 @@ void Settings::init() {
     for (auto&& s : listSpins) {
         s->setFixedSize(200, 100);
         s->setStyleSheet(Style::SpinSettings);
+        s->setMaximum(65535);
     }
     enable(false);
 }

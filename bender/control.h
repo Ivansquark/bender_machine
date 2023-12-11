@@ -25,7 +25,8 @@ class Control : public QWidget {
     void setPmode(Fileops::Pmode mode);
     void setPauto(Fileops::Pauto autoState);
   signals:
-    void onButStart();
+    void onButStartPressed();
+    void onButStartReleased();
     void sendCurrentModePressed(Fileops::Pmode mode);
     void onButManual();
     void onButSemiAuto();

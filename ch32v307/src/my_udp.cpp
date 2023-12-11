@@ -48,7 +48,7 @@ void Udp::receive_Local_callback(void*, [[maybe_unused]] struct udp_pcb* upcb,
     if (udp_msg_receive[1] == Protocol::Commands::SEND_SET_SETTINGS) {
         Udp::pThis->receiveCommandSet =
             Protocol::parseFrameSet(udp_msg_receive, pLen);
-        Udp::pThis->IsDataReceived = true;
+        Udp::pThis->IsDataSetReceived = true;
     } else {
         Udp::pThis->receiveCommand =
             Protocol::parseFrame(udp_msg_receive, pLen);

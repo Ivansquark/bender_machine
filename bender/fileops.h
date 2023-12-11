@@ -63,6 +63,17 @@ class Fileops : public QObject {
     YX getFileValues(Pnum num, Pmode mode);
     Pauto getFilePauto();
     void setFilePauto(Pauto val);
+
+    struct Settings {
+        uint32_t coefY = 100;
+        uint32_t coefX = 100;
+        uint32_t deviationY = 100;
+        uint32_t deviationX = 100;
+    };
+    Settings currentSettings;
+    Settings getSettings();
+    void setSettings(Settings set);
+
   signals:
     void sendCurrentPmode(Pmode);
     void sendCurrentPnum(Pnum);

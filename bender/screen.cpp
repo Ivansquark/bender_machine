@@ -75,7 +75,10 @@ void Screen::init() {
             });
 
     //-------------- control --------------------------------------------------
-    connect(control, &Control::onButStart, this, &Screen::onButStart);
+    connect(control, &Control::onButStartPressed, this,
+            &Screen::onButStartPressed);
+    connect(control, &Control::onButStartReleased, this,
+            &Screen::onButStartReleased);
     connect(control, &Control::sendCurrentModePressed,
             [this](Fileops::Pmode mode) {
                 currentPmode = mode;
@@ -237,18 +240,17 @@ void Screen::init() {
 
     //-------------- Settings -------------------------------------------------
     connect(set.get(), &Settings::sendGetData, [this]() {
-        currentCommand.currentCommand =
-            Protocol::Commands::SEND_GET_SETTINGS;
+        currentCommand.currentCommand = Protocol::Commands::SEND_GET_SETTINGS;
         interface->sendData(currentCommand);
     });
-    connect(set.get(), &Settings::sendSetData, [this]() {
-        currentCommand.currentCommand =
-            Protocol::Commands::SEND_GET_SETTINGS;
-        interface->sendData(currentCommand);
-    });
-    connect(interface.get(), &Interface::sendCurrentReplySet, [&](const Protocol::ReplySet& reply) {
-        set->setData(reply);
-    });
+    connect(set.get(), &Settings::sendSetData,
+            [this](const Protocol::CommandSet& set) {
+                interface->sendDataSettings(set);
+            });
+    connect(interface.get(), &Interface::sendCurrentReplySet,
+            [&](const Protocol::ReplySet& reply) { set->setData(reply); });
+    Fileops::Settings set{99, 99, 99, 99};
+    fileops.setSettings(set);
 }
 
 void Screen::getYX() {
@@ -325,7 +327,7 @@ void Screen::mousePressEvent(QMouseEvent* event) {
 
         set->setModal(true);
         set->show();
-        //set->exec();
+        // set->exec();
     }
     //    if (event->pos().x() >= control->butDash->x() &&
     //        event->pos().x() <= control->butDash->x() +
@@ -335,7 +337,7 @@ void Screen::mousePressEvent(QMouseEvent* event) {
     //    }
 }
 
-void Screen::mouseReleaseEvent(QMouseEvent* event) {
+void Screen::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
     //    if (event->pos().x() >= control->butDash->x() &&
     //        event->pos().x() <= control->butDash->x() +
     //        control->butDash->width() && event->pos().y() >=
@@ -459,26 +461,17 @@ void Screen::onButEnterClicked() {
     currentXorY = XorY::NONE;
 }
 
-void Screen::onButStart() {
+void Screen::onButStartPressed() {
     control->setStart(true);
     currentCommand.currentCommand = Protocol::SEND_START_X;
     getYX();
     currentCommand.val = currentX;
     interface->sendData(currentCommand);
-
-    //    if (isStarted) {
-    //        control->setStart(true);
-    //        isStarted = false;
-    //        moveTimer.stop();
-
-    //    } else {
-    //        control->setStart(false);
-    //        isStarted = true;
-    //        moveTimer.start(1);
-    //        currentCommand.currentCommand = Protocol::SEND_START_X;
-    //        currentCommand.val = currentX;
-    //        interface->sendData(currentCommand);
-    //    }
+}
+void Screen::onButStartReleased() {
+    control->setStart(false);
+    currentCommand.currentCommand = Protocol::SEND_STOP;
+    interface->sendData(currentCommand);
 }
 
 void Screen::getCurrentReply(const Protocol::Reply& reply) {
@@ -575,12 +568,21 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         setCalibrationState(false);
         setManualMoovement(false);
         break;
-    case Protocol::Replies::NEED_CALIBRATION:
+    case Protocol::Replies::NEED_CALIBRATION: {
         qDebug() << "Get: Replies::CALIBRATION_X_STOP" << reply.val;
         labInfoY->setText("Calibration Y started");
         IsCalibrated = false;
         setCalibrationState(true);
-        break;
+        // TODO: send settings from file
+        Fileops::Settings settings = fileops.getSettings();
+        currentCommandSet.currentCommand =
+            Protocol::Commands::SEND_SET_SETTINGS;
+        currentCommandSet.coefY = settings.coefY;
+        currentCommandSet.coefX = settings.coefX;
+        currentCommandSet.deviationY = settings.deviationY;
+        currentCommandSet.deviationX = settings.deviationX;
+        set->firstSendSettings(currentCommandSet);
+    } break;
     default:
         break;
     }

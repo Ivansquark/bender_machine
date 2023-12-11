@@ -26,8 +26,11 @@ class Pwm {
 
     inline void startX() { TIM1->CTLR1 |= TIM_CEN; }
     inline void stopX() { TIM1->CTLR1 &= ~TIM_CEN; }
+    inline bool isXstopped() { return !(TIM1->CTLR1 & TIM_CEN); }
+
     inline void startY() { TIM9->CTLR1 |= TIM_CEN; }
     inline void stopY() { TIM9->CTLR1 &= ~TIM_CEN; }
+    inline bool isYstopped() { return !(TIM9->CTLR1 & TIM_CEN); }
 
   private:
     void init();

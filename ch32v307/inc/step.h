@@ -24,6 +24,8 @@ class StepY {
     void startPlus();
     void startMinus();
     void stop();
+    bool isStopped();
+    inline uint32_t getCounterPWM() {return pwm.counterY;}
 
     uint32_t stopValue = 0;
     uint32_t currentValue = 0;
@@ -83,6 +85,8 @@ class StepX {
     void startPlus();
     void startMinus();
     void stop();
+    bool isStopped();
+    inline uint32_t getCounterPWM() {return pwm.counterX;}
 
     uint32_t stopValue = 0;
     uint32_t currentValue = 0;

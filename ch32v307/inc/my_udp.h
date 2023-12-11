@@ -34,6 +34,7 @@ class Udp {
     bool WaitForReply = false;
     bool MustSendReply = false;
     bool IsDataReceived = false;
+    bool IsDataSetReceived = false;
     bool MustSend = false;
     bool MustResend = false;
 

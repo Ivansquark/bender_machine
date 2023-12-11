@@ -48,7 +48,8 @@ class Screen : public QDialog {
     void onButXClicked();
     void onButYClicked();
     void onButEnterClicked();
-    void onButStart();
+    void onButStartPressed();
+    void onButStartReleased();
 
     void getCurrentReply(const Protocol::Reply& reply);
 
@@ -117,6 +118,7 @@ class Screen : public QDialog {
     Fileops fileops;
     //---------------- Interface ----------------------------------------------
     Protocol::Command currentCommand;
+    Protocol::CommandSet currentCommandSet;
     Protocol::Reply currentReply;
     std::unique_ptr<Interface> interface = std::make_unique<Interface>();
     //---------------- timers -------------------------------------------------

@@ -97,7 +97,10 @@ void Control::init() {
     butDash->setStyleSheet(Style::ButReleased);
 
     //-------------- connects -------------------------------------------------
-    connect(butStart, &QPushButton::clicked, [this] { emit onButStart(); });
+    //connect(butStart, &QPushButton::clicked, [this] { emit onButStart(); });
+    connect(butStart, &QPushButton::pressed, [this] { emit onButStartPressed(); });
+    connect(butStart, &QPushButton::released, [this] { emit onButStartReleased(); });
+
     connect(radioP1, &QRadioButton::clicked,
             [this] { emit sendCurrentModePressed(Fileops::Pmode1); });
     connect(radioP2, &QRadioButton::clicked,

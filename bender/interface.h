@@ -18,7 +18,7 @@ class Interface : public QObject {
     Protocol::ReplySet currentReplySet;
 
     void sendData(const Protocol::Command& command);
-    void sendDataSettings(const Protocol::ReplySet& command);
+    void sendDataSettings(const Protocol::CommandSet& command);
   signals:
     void sendCurrentReply(const Protocol::Reply& reply);
     void sendCurrentReplySet(const Protocol::ReplySet& reply);

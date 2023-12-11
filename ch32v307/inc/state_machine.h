@@ -11,6 +11,7 @@ class StateMachine {
     void handler();
     //------------- interrupt -------------------------------------------------
     static void interruptHandler();
+    //------------- timers ----------------------------------------------------
     bool TimerReplyStart = false;
     uint32_t timerReplyCounter = 0;
     uint32_t timerReplyCounterMax = 0;
@@ -18,6 +19,15 @@ class StateMachine {
     void timerReplyStop();
     void timerReplyTimeout();
     bool IsTimeout = false;
+
+    bool TimerCalStart = false;
+    uint32_t timerCalCounter = 0;
+    uint32_t timerCalCounterMax = 0;
+    void timerCalStart(uint32_t ms);
+    void timerCalStop();
+    void timerCalTimeout();
+    bool IsCalTimeout = false;
+
 
     bool IsCalibrated = false;
 
@@ -27,9 +37,13 @@ class StateMachine {
         NONE,
         CAL_X_START,
         CAL_X,
+        CAL_X_DEVIATION_START,
+        CAL_X_DEVIATION,
         CAL_X_STOP,
         CAL_Y_START,
         CAL_Y,
+        CAL_Y_DEVIATION_START,
+        CAL_Y_DEVIATION,
         CAL_Y_STOP
     };
     CalibrationStates currentCalibrationState = CalibrationStates::NONE;

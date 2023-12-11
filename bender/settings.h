@@ -18,6 +18,7 @@ class Settings : public QDialog {
     explicit Settings(QWidget* parent = nullptr);
 
     void setData(const Protocol::ReplySet&);
+    void firstSendSettings(const Protocol::CommandSet& val);
 
   signals:
     void sendGetData();
@@ -52,10 +53,10 @@ class Settings : public QDialog {
     QPushButton* but9 = new QPushButton("9", this);
 
     //--------------- Settings ------------------------------------------------
-    QLabel* labDeviationX = new QLabel("Deviation Y", this);
-    QLabel* labDeviationY = new QLabel("Deviation X", this);
-    QLabel* labCoefX = new QLabel("Coefficient Y", this);
-    QLabel* labCoefY = new QLabel("Coefficient X", this);
+    QLabel* labDeviationX = new QLabel("Deviation X", this);
+    QLabel* labDeviationY = new QLabel("Deviation Y", this);
+    QLabel* labCoefX = new QLabel("Coefficient X", this);
+    QLabel* labCoefY = new QLabel("Coefficient Y", this);
     QSpinBox* spinDeviationX = new QSpinBox(this);
     QSpinBox* spinDeviationY = new QSpinBox(this);
     QSpinBox* spinCoefX = new QSpinBox(this);

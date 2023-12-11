@@ -28,28 +28,28 @@ void Interface::sendData(const Protocol::Command& command) {
     // if usb ...
 }
 
-void Interface::sendDataSettings(const Protocol::ReplySet& data) {
+void Interface::sendDataSettings(const Protocol::CommandSet& data) {
     // if udp
-    currentReplySet = data;
+    currentCommandSet = data;
     QByteArray arr;
     arr.append(Protocol::TO);
-    arr.append((uint8_t)currentReplySet.currentReply);
-    arr.append((uint8_t)(currentReplySet.coefY >> 24));
-    arr.append((uint8_t)(currentReplySet.coefY >> 16));
-    arr.append((uint8_t)(currentReplySet.coefY >> 8));
-    arr.append((uint8_t)(currentReplySet.coefY));
-    arr.append((uint8_t)(currentReplySet.coefX >> 24));
-    arr.append((uint8_t)(currentReplySet.coefX >> 16));
-    arr.append((uint8_t)(currentReplySet.coefX >> 8));
-    arr.append((uint8_t)(currentReplySet.coefX));
-    arr.append((uint8_t)(currentReplySet.deviationY >> 24));
-    arr.append((uint8_t)(currentReplySet.deviationY >> 16));
-    arr.append((uint8_t)(currentReplySet.deviationY >> 8));
-    arr.append((uint8_t)(currentReplySet.deviationY));
-    arr.append((uint8_t)(currentReplySet.deviationX >> 24));
-    arr.append((uint8_t)(currentReplySet.deviationX >> 16));
-    arr.append((uint8_t)(currentReplySet.deviationX >> 8));
-    arr.append((uint8_t)(currentReplySet.deviationX));
+    arr.append((uint8_t)currentCommandSet.currentCommand);
+    arr.append((uint8_t)(currentCommandSet.coefY >> 24));
+    arr.append((uint8_t)(currentCommandSet.coefY >> 16));
+    arr.append((uint8_t)(currentCommandSet.coefY >> 8));
+    arr.append((uint8_t)(currentCommandSet.coefY));
+    arr.append((uint8_t)(currentCommandSet.coefX >> 24));
+    arr.append((uint8_t)(currentCommandSet.coefX >> 16));
+    arr.append((uint8_t)(currentCommandSet.coefX >> 8));
+    arr.append((uint8_t)(currentCommandSet.coefX));
+    arr.append((uint8_t)(currentCommandSet.deviationY >> 24));
+    arr.append((uint8_t)(currentCommandSet.deviationY >> 16));
+    arr.append((uint8_t)(currentCommandSet.deviationY >> 8));
+    arr.append((uint8_t)(currentCommandSet.deviationY));
+    arr.append((uint8_t)(currentCommandSet.deviationX >> 24));
+    arr.append((uint8_t)(currentCommandSet.deviationX >> 16));
+    arr.append((uint8_t)(currentCommandSet.deviationX >> 8));
+    arr.append((uint8_t)(currentCommandSet.deviationX));
     udp->sendDataToUdp(arr);
     timerReply.start(100);
     // if usb ...

@@ -16,7 +16,7 @@ void Udp::readDatagrammGet() {
     QHostAddress senderIP = QHostAddress::Any;
 
     uint16_t sizeDatagram = udpSocketGet->pendingDatagramSize();
-    char arr[6];
+    char arr[256];
     udpSocketGet->readDatagram(arr, sizeDatagram, &senderIP);
     //QByteArray bArr;
     qDebug() << bArr->data();
@@ -30,4 +30,5 @@ void Udp::readDatagrammGet() {
 }
 void Udp::sendDataToUdp(const QByteArray& bytes) {
     udpSocketSend->writeDatagram(bytes, QHostAddress(IP_MCU), MCU_PORT);
+    qDebug() << bytes;
 }

@@ -25,6 +25,10 @@ void StepY::stop() {
     Buzzer::pThis->setMustBuzz(false);
 }
 
+bool StepY::isStopped() {
+    return pwm.isYstopped();
+}
+
 void StepY::handler() {
     currentValue = pwm.counterY / coeff;
     switch (currentState) {
@@ -142,6 +146,10 @@ void StepX::stop() {
     Buzzer::pThis->setMustBuzz(false);
 }
 
+bool StepX::isStopped() {
+    return pwm.isXstopped();
+}
+
 void StepX::handler() {
     // currentValue = (pwm.counterX) / coeff;
     currentValue = (pwm.counterX) / coeff;
@@ -199,6 +207,14 @@ void StepX::handler() {
                 Udp::pThis->reply.currentReply = Protocol::LIMIT_X_PLUS;
                 Udp::pThis->reply.val = currentValue;
             }
+            //if (getLimitMinus()) {
+            //    stop();
+            //    currentState = STOP;
+            //    // send signal about final place
+            //    Udp::pThis->MustSend = true;
+            //    Udp::pThis->reply.currentReply = Protocol::LIMIT_X_MINUS;
+            //    Udp::pThis->reply.val = currentValue;
+            //}
         }
         break;
     case MOVING_MINUS:
@@ -229,6 +245,15 @@ void StepX::handler() {
                 Udp::pThis->reply.currentReply = Protocol::LIMIT_X_MINUS;
                 Udp::pThis->reply.val = currentValue;
             }
+            //if (getLimitPlus()) {
+            //    stop();
+            //    currentState = STOP;
+            //    // send signal about final place
+            //    Udp::pThis->MustSend = true;
+            //    Udp::pThis->reply.currentReply = Protocol::LIMIT_X_PLUS;
+            //    Udp::pThis->reply.val = currentValue;
+            //}
+
         }
         break;
     default:

@@ -7,11 +7,19 @@ StateMachine::StateMachine() {
     stepX.stop();
     stepY.stop();
     udp.WaitForReply = false;
+    // TODO: start timer to send NEED_CALIBRATION
+    timerCalStart(500);
     // udp.reply.currentReply = Protocol::Replies::NEED_CALIBRATION;
     // udp.MustSend = true;
 }
 
 void StateMachine::handler() {
+    //--------------  Calibration timer handler -------------------------------
+    if (IsCalTimeout) {
+        IsCalTimeout = false;
+        udp.reply.currentReply = Protocol::Replies::NEED_CALIBRATION;
+        udp.MustSend = true;
+    }
     //--------------  receive handler  ----------------------------------------
     if (udp.WaitForReply) {
         if (IsTimeout) {
@@ -40,6 +48,16 @@ void StateMachine::handler() {
             // udp.MustSendReply = true;
             timerReplyStop();
         }
+    } else if (udp.IsDataSetReceived) {
+        udp.IsDataSetReceived = false;
+        // parse data
+        udp.sendReply();
+        // udp.MustSendReply = true;
+        timerReplyStop();
+        stepX.coeff = Udp::pThis->receiveCommandSet.coefX;
+        stepY.coeff = Udp::pThis->receiveCommandSet.coefY;
+        stepX.deviation = Udp::pThis->receiveCommandSet.deviationX;
+        stepY.deviation = Udp::pThis->receiveCommandSet.deviationY;
     }
     // if (udp.MustSendReply) {
     //     udp.sendReply();
@@ -96,6 +114,12 @@ void StateMachine::parse() {
     case Protocol::SEND_START_Y:
         stepY.currentState = StepY::START_MOVING;
         stepY.stopValue = udp.receiveCommand.val;
+        break;
+    case Protocol::SEND_STOP:
+        stepY.stop();
+        stepY.currentState = StepY::STOP;
+        stepX.stop();
+        stepX.currentState = StepX::STOP;
         break;
     case Protocol::SEND_NEW_VAL_X:
         stepX.stopValue = udp.receiveCommand.val;
@@ -168,6 +192,21 @@ void StateMachine::calibrationHandler() {
             stepX.stop();
             stepX.currentValue = 0;
             stepX.clearPwmCounter();
+            currentCalibrationState = CAL_X_DEVIATION_START;
+            // currentCalibrationState = CAL_X_STOP;
+        }
+        break;
+    case CAL_X_DEVIATION_START:
+        stepX.startPlus();
+        stepX.stopValue = stepX.deviation;
+        currentCalibrationState = CAL_X_DEVIATION;
+        break;
+    case CAL_X_DEVIATION:
+        stepX.currentValue = stepX.getCounterPWM() / stepX.coeff;
+        if (stepX.currentValue >= stepX.stopValue) {
+            stepX.stop();
+            stepX.currentValue = 0;
+            stepX.clearPwmCounter();
             currentCalibrationState = CAL_X_STOP;
         }
         break;
@@ -183,6 +222,21 @@ void StateMachine::calibrationHandler() {
         break;
     case CAL_Y:
         if (stepY.getLimitMinus()) {
+            stepY.stop();
+            stepY.currentValue = 0;
+            stepY.clearPwmCounter();
+            currentCalibrationState = CAL_Y_DEVIATION_START;
+            // currentCalibrationState = CAL_Y_STOP;
+        }
+        break;
+    case CAL_Y_DEVIATION_START:
+        stepY.startPlus();
+        stepY.stopValue = stepY.deviation;
+        currentCalibrationState = CAL_Y_DEVIATION;
+        break;
+    case CAL_Y_DEVIATION:
+        stepY.currentValue = stepY.getCounterPWM() / stepY.coeff;
+        if (stepY.currentValue >= stepY.stopValue) {
             stepY.stop();
             stepY.currentValue = 0;
             stepY.clearPwmCounter();
@@ -216,6 +270,20 @@ void StateMachine::timerReplyTimeout() {
     IsTimeout = true;
     timerReplyStop();
 }
+void StateMachine::timerCalStart(uint32_t ms) {
+    timerCalCounterMax = ms;
+    timerCalCounter = 0;
+    TimerCalStart = true;
+}
+void StateMachine::timerCalStop() {
+    timerCalCounter = 0;
+    TimerCalStart = false;
+}
+
+void StateMachine::timerCalTimeout() {
+    IsCalTimeout = true;
+    timerCalStop();
+}
 
 void StateMachine::interruptHandler() {
     if (StateMachine::pThis->TimerReplyStart) {
@@ -226,6 +294,16 @@ void StateMachine::interruptHandler() {
             StateMachine::pThis->TimerReplyStart = false;
         } else {
             StateMachine::pThis->timerReplyCounter++;
+        }
+    }
+    if (StateMachine::pThis->TimerCalStart) {
+        if (StateMachine::pThis->timerCalCounter >=
+            StateMachine::pThis->timerCalCounterMax) {
+            StateMachine::pThis->timerCalTimeout();
+            StateMachine::pThis->timerCalCounter = 0;
+            StateMachine::pThis->TimerCalStart = false;
+        } else {
+            StateMachine::pThis->timerCalCounter++;
         }
     }
 }

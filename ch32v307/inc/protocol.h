@@ -13,6 +13,7 @@ enum Direction {
 enum Commands {
     SEND_START_Y,
     SEND_START_X,
+    SEND_STOP,
     SEND_NEW_VAL_Y,
     SEND_NEW_VAL_X,
     SEND_Y_PLUS,

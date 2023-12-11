@@ -82,8 +82,7 @@ Fileops::YX Fileops::getFileValues(Pnum num, Pmode mode) {
     return tempYX;
 }
 
-Fileops::Pauto Fileops::getFilePauto()
-{
+Fileops::Pauto Fileops::getFilePauto() {
     std::fstream file("programs.csv", std::ios::in);
     if (file.is_open()) {
         std::string line;
@@ -95,8 +94,7 @@ Fileops::Pauto Fileops::getFilePauto()
     return currentPauto;
 }
 
-void Fileops::setFilePauto(Pauto val)
-{
+void Fileops::setFilePauto(Pauto val) {
     std::fstream file("programs.csv", std::ios::in);
     if (file.is_open()) {
         std::string line;
@@ -108,7 +106,54 @@ void Fileops::setFilePauto(Pauto val)
         // change values
         currentPauto = val;
         vectStr[0] = std::to_string(currentPauto);
-        //write
+        // write
+        file.open("programs.csv", std::ios_base::out);
+        std::string fullStr;
+        for (auto& i : vectStr) {
+            fullStr += i + "\n";
+        }
+        // qDebug() << fullStr.data();
+        file.write(fullStr.data(), fullStr.size());
+        file.close();
+    }
+}
+
+Fileops::Settings Fileops::getSettings() {
+    std::fstream file("programs.csv", std::ios::in);
+    if (file.is_open()) {
+        std::string line;
+        std::vector<std::string> vectStr;
+        while (std::getline(file, line)) {
+            vectStr.push_back(line);
+        }
+        file.close();
+        // change values
+        currentSettings.coefY = std::stoi(vectStr[34]);
+        currentSettings.coefX = std::stoi(vectStr[35]);
+        currentSettings.deviationY = std::stoi(vectStr[36]);
+        currentSettings.deviationX = std::stoi(vectStr[37]);
+    }
+    return currentSettings;
+}
+
+void Fileops::setSettings(Settings set) {
+    currentSettings = set;
+    // write to file
+    std::fstream file("programs.csv", std::ios::in);
+    if (file.is_open()) {
+        std::string line;
+        std::vector<std::string> vectStr;
+        while (std::getline(file, line)) {
+            vectStr.push_back(line);
+        }
+        file.close();
+
+        // change values
+        vectStr[34] = std::to_string(currentSettings.coefY);
+        vectStr[35] = std::to_string(currentSettings.coefX);
+        vectStr[36] = std::to_string(currentSettings.deviationY);
+        vectStr[37] = std::to_string(currentSettings.deviationX);
+
         file.open("programs.csv", std::ios_base::out);
         std::string fullStr;
         for (auto& i : vectStr) {
@@ -123,8 +168,10 @@ void Fileops::setFilePauto(Pauto val)
 void Fileops::init() {
     //------------- filesystem ------------------------------------------------
     // TODO: open file csv (create if not opened)
-    // 0 line - current program num
-    // 1 - 32 lines - Yfloat, Xfloat
+    // 1 line - current AUTO MODE
+    // 2 line - current program num
+    // 3 - 34 lines - Yfloat, Xfloat
+    // 35 - 38 - Settings
     std::fstream file("programs.csv", std::ios::in);
     if (file.is_open()) {
         std::string line;
@@ -143,13 +190,35 @@ void Fileops::init() {
             currentPmode = Pmode2;
             currentPnum = (Pnum)(num - 16);
         }
+        // read program values
+        for (int i = 0; i < 32; ++i) {
+            getline(file, line);
+        }
+        line.clear();
+        getline(file, line);
+        currentSettings.coefY = std::stoi(line);
+        line.clear();
+        getline(file, line);
+        currentSettings.coefX = std::stoi(line);
+        line.clear();
+        getline(file, line);
+        currentSettings.deviationY = std::stoi(line);
+        line.clear();
+        getline(file, line);
+        currentSettings.deviationX = std::stoi(line);
+
     } else {
         qDebug() << "cant open file";
         file.open("programs.csv", std::ios_base::out);
         QString str;
-        str += "0\n"; //MANUAL
-        str += "1\n";
+        str += "0\n"; // MANUAL MODE
+        str += "1\n"; // Pnum
+        // program values
         for (int i = 0; i < 32; i++) {
+            str += "0,0\n";
+        }
+        // settings
+        for (int i = 0; i < 4; i++) {
             str += "0,0\n";
         }
         str += '\0';
