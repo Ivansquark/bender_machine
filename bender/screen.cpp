@@ -1,7 +1,10 @@
 #include "screen.h"
 #include "style.h"
 
-Screen::Screen(QWidget* parent) : QDialog(parent) { init(); }
+Screen::Screen(QWidget* parent) : QDialog(parent) {
+    setAttribute(Qt::WA_AcceptTouchEvents, true);
+    init();
+}
 
 Screen::~Screen() {
     delete layVleftY;
@@ -12,7 +15,8 @@ Screen::~Screen() {
 }
 
 void Screen::init() {
-    setFixedSize(1024, 600);
+    // setFixedSize(1024, 600);
+
     // connect(butExit, &QPushButton::clicked, [this] { close(); });
     layVleftY->addWidget(labSetPosY);
     layVleftY->addWidget(labInfoY);
@@ -244,13 +248,21 @@ void Screen::init() {
         interface->sendData(currentCommand);
     });
     connect(set.get(), &Settings::sendSetData,
-            [this](const Protocol::CommandSet& set) {
+            [this](bool IsNeedToWriteInFile, const Protocol::CommandSet& set) {
+                if (IsNeedToWriteInFile) {
+                    Fileops::Settings s{0, 0, 0, 0};
+                    s.coefY = set.coefY;
+                    s.coefX = set.coefX;
+                    s.deviationY = set.deviationY;
+                    s.deviationX = set.deviationX;
+                    fileops.setSettings(s);
+                }
                 interface->sendDataSettings(set);
             });
     connect(interface.get(), &Interface::sendCurrentReplySet,
             [&](const Protocol::ReplySet& reply) { set->setData(reply); });
-    Fileops::Settings set{99, 99, 99, 99};
-    fileops.setSettings(set);
+    // Fileops::Settings set{99, 99, 99, 99};
+    // fileops.setSettings(set);
 }
 
 void Screen::getYX() {
@@ -317,17 +329,15 @@ void Screen::mousePressEvent(QMouseEvent* event) {
             setManualMoovement(true);
         }
     }
+    //---------------- Settings window ----------------------------------------
     if (event->pos().x() >= labPosY->x() &&
         event->pos().x() <= labPosY->x() + labPosY->width() &&
         event->pos().y() >= labPosY->y() &&
         event->pos().y() <= labPosY->y() + labPosY->height()) {
-        //---------------- Settings -------------------------------------------
 
-        // qDebug() << "On label Y pressed";
-
+        if (IsCalibrated) return;
         set->setModal(true);
         set->show();
-        // set->exec();
     }
     //    if (event->pos().x() >= control->butDash->x() &&
     //        event->pos().x() <= control->butDash->x() +
@@ -345,6 +355,35 @@ void Screen::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
     //        + control->butDash->height()) { qDebug() << "Calibation released";
     //    }
 }
+
+// void Screen::touchEvent(QTouchEvent* ev) {
+//     switch (ev->type()) {
+//     case QEvent::TouchBegin:
+//         qDebug() << "TouchBegin";
+//         break;
+//     case QEvent::TouchEnd:
+//         qDebug() << "TouchEnd";
+//         break;
+//     case QEvent::TouchUpdate: {
+//         qDebug() << "TouchUpdate";
+//         break;
+//     }
+//     }
+// }
+
+//bool Screen::event(QEvent* ev) {
+//    qDebug() << "event" << ev->type();
+//    switch (ev->type()) {
+//    case QEvent::TouchBegin:
+//        qDebug() << "TouchBegin";
+//        break;
+//    case QEvent::TouchEnd:
+//        qDebug() << "TouchEnd";
+//        break;
+//    default:
+//        return ev;
+//    }
+//}
 
 void Screen::addSymbol(char sym) {
     if (currentXorY == XorY::X) {

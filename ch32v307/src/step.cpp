@@ -5,51 +5,79 @@ StepY* StepY::pThis = nullptr;
 StepY::StepY() { pThis = this; }
 
 void StepY::startPlus() {
-    pwm.currentDirectionY = Pwm::DirectionY::UP;
+    pwm.currentDirection = PwmY::Direction::UP;
     enableOn();
     dirOn();
-    pwm.startY();
+    pwm.start();
     Buzzer::pThis->setMustBuzz(true);
 }
 
 void StepY::startMinus() {
-    pwm.currentDirectionY = Pwm::DirectionY::DOWN;
+    pwm.currentDirection = PwmY::Direction::DOWN;
     enableOn();
     dirOff();
-    pwm.startY();
+    pwm.start();
     Buzzer::pThis->setMustBuzz(true);
 }
 
 void StepY::stop() {
-    pwm.stopY();
+    pwm.stop();
     Buzzer::pThis->setMustBuzz(false);
 }
 
-bool StepY::isStopped() {
-    return pwm.isYstopped();
+bool StepY::isStopped() { return pwm.isStopped(); }
+
+void StepY::fast_slow(Dir dir) {
+    if (dir == Dir::PLUS) {
+        if (stopValue - startValue < NUM_STEPS_FOR_SPEED_CHANGE) {
+            pwm.slow();
+            return;
+        }
+        if ((currentValue > (startValue + NUM_STEPS_FOR_SPEED_CHANGE)) &&
+            (currentValue < (stopValue - NUM_STEPS_FOR_SPEED_CHANGE))) {
+            pwm.fast();
+        } else {
+            pwm.slow();
+        }
+    } else {
+        if (startValue - stopValue < NUM_STEPS_FOR_SPEED_CHANGE) {
+            pwm.slow();
+            return;
+        }
+        if ((currentValue < (startValue - NUM_STEPS_FOR_SPEED_CHANGE)) &&
+            (currentValue > (stopValue + NUM_STEPS_FOR_SPEED_CHANGE))) {
+            pwm.fast();
+        } else {
+            pwm.slow();
+        }
+    }
 }
 
 void StepY::handler() {
-    currentValue = pwm.counterY / coeff;
+    currentValue = pwm.counter / coeff;
     switch (currentState) {
     case STOP:
         break;
     case START_MOVING:
-        //if (currentValue < stopValue) {
-        if (pwm.counterY < stopValue * coeff) {
+        // if (currentValue < stopValue) {
+        if (pwm.counter < stopValue * coeff) {
             currentState = MOVING_PLUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_Y;
             Udp::pThis->reply.val = currentValue;
+            startValue = currentValue;
             startPlus();
+            pwm.slow();
             // TODO: block all
-        //} else if (currentValue > stopValue) {
-        } else if (pwm.counterY > stopValue * coeff) {
+            //} else if (currentValue > stopValue) {
+        } else if (pwm.counter > stopValue * coeff) {
             currentState = MOVING_MINUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_Y;
             Udp::pThis->reply.val = currentValue;
+            startValue = currentValue;
             startMinus();
+            pwm.slow();
             // TODO: block all
         } else {
             currentState = STOP;
@@ -59,16 +87,18 @@ void StepY::handler() {
         }
         break;
     case MOVING_PLUS:
-        //if (currentValue >= stopValue) {
-        if (pwm.counterY >= stopValue * coeff) {
+        // if (currentValue >= stopValue) {
+        if (pwm.counter >= stopValue * coeff) {
             stop();
             currentState = STOP;
             // send signal about final place
-            currentValue = pwm.counterY / coeff;
+            currentValue = pwm.counter / coeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_Y;
             Udp::pThis->reply.val = currentValue;
         } else {
+            // check for fast or low speed
+            fast_slow(Dir::PLUS);
             // TODO: send currentValue
             if (previousValue != currentValue) {
                 Udp::pThis->MustSend = true;
@@ -88,16 +118,17 @@ void StepY::handler() {
         }
         break;
     case MOVING_MINUS:
-        //if (currentValue <= stopValue) {
-        if (pwm.counterX <= stopValue * coeff) {
+        // if (currentValue <= stopValue) {
+        if (pwm.counter <= stopValue * coeff) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
-            currentValue = pwm.counterY / coeff;
+            currentValue = pwm.counter / coeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_Y;
             Udp::pThis->reply.val = currentValue;
         } else {
+            fast_slow(Dir::MINUS);
             // TODO: send currentValue
             if (previousValue != currentValue) {
                 Udp::pThis->MustSend = true;
@@ -126,51 +157,77 @@ StepX* StepX::pThis = nullptr;
 StepX::StepX() { pThis = this; }
 
 void StepX::startPlus() {
-    pwm.currentDirectionX = Pwm::DirectionX::PLUS;
+    pwm.currentDirection = PwmX::Direction::PLUS;
     enableOn();
     dirOn();
-    pwm.startX();
+    pwm.start();
     Buzzer::pThis->setMustBuzz(true);
 }
 
 void StepX::startMinus() {
-    pwm.currentDirectionX = Pwm::DirectionX::MINUS;
+    pwm.currentDirection = PwmX::Direction::MINUS;
     enableOn();
     dirOff();
-    pwm.startX();
+    pwm.start();
     Buzzer::pThis->setMustBuzz(true);
 }
 
 void StepX::stop() {
-    pwm.stopX();
+    pwm.stop();
     Buzzer::pThis->setMustBuzz(false);
 }
 
-bool StepX::isStopped() {
-    return pwm.isXstopped();
+bool StepX::isStopped() { return pwm.isStopped(); }
+
+void StepX::fast_slow(Dir dir) {
+    if (dir == Dir::PLUS) {
+        if (stopValue - startValue < NUM_STEPS_FOR_SPEED_CHANGE) {
+            pwm.slow();
+            return;
+        }
+        if ((currentValue > (startValue + NUM_STEPS_FOR_SPEED_CHANGE)) &&
+            (currentValue < (stopValue - NUM_STEPS_FOR_SPEED_CHANGE))) {
+            pwm.fast();
+        } else {
+            pwm.slow();
+        }
+    } else {
+        if (startValue - stopValue < NUM_STEPS_FOR_SPEED_CHANGE) {
+            pwm.slow();
+            return;
+        }
+        if ((currentValue < (startValue - NUM_STEPS_FOR_SPEED_CHANGE)) &&
+            (currentValue > (stopValue + NUM_STEPS_FOR_SPEED_CHANGE))) {
+            pwm.fast();
+        } else {
+            pwm.slow();
+        }
+    }
 }
 
 void StepX::handler() {
     // currentValue = (pwm.counterX) / coeff;
-    currentValue = (pwm.counterX) / coeff;
+    currentValue = (pwm.counter) / coeff;
     switch (currentState) {
     case STOP:
         break;
     case START_MOVING:
         // if (currentValue < stopValue) {
-        if (pwm.counterX < stopValue * coeff) {
+        if (pwm.counter < stopValue * coeff) {
             currentState = MOVING_PLUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_X;
             Udp::pThis->reply.val = currentValue;
+            startValue = currentValue;
             startPlus();
             // TODO: block all
             //} else if (currentValue > stopValue) {
-        } else if (pwm.counterX > stopValue * coeff) {
+        } else if (pwm.counter > stopValue * coeff) {
             currentState = MOVING_MINUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_X;
             Udp::pThis->reply.val = currentValue;
+            startValue = currentValue;
             startMinus();
             // TODO: block all
         } else {
@@ -182,15 +239,16 @@ void StepX::handler() {
         }
         break;
     case MOVING_PLUS:
-        if (pwm.counterX >= stopValue * coeff) {
+        if (pwm.counter >= stopValue * coeff) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
-            currentValue = (pwm.counterX) / coeff;
+            currentValue = (pwm.counter) / coeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_X;
             Udp::pThis->reply.val = currentValue;
         } else {
+            fast_slow(Dir::PLUS);
             // send currentValue
             if (previousValue != currentValue) {
                 Udp::pThis->MustSend = true;
@@ -207,28 +265,29 @@ void StepX::handler() {
                 Udp::pThis->reply.currentReply = Protocol::LIMIT_X_PLUS;
                 Udp::pThis->reply.val = currentValue;
             }
-            //if (getLimitMinus()) {
-            //    stop();
-            //    currentState = STOP;
-            //    // send signal about final place
-            //    Udp::pThis->MustSend = true;
-            //    Udp::pThis->reply.currentReply = Protocol::LIMIT_X_MINUS;
-            //    Udp::pThis->reply.val = currentValue;
-            //}
+            // if (getLimitMinus()) {
+            //     stop();
+            //     currentState = STOP;
+            //     // send signal about final place
+            //     Udp::pThis->MustSend = true;
+            //     Udp::pThis->reply.currentReply = Protocol::LIMIT_X_MINUS;
+            //     Udp::pThis->reply.val = currentValue;
+            // }
         }
         break;
     case MOVING_MINUS:
         // if (currentValue <= stopValue) {
-        if (pwm.counterX <= stopValue * coeff) {
+        if (pwm.counter <= stopValue * coeff) {
             // if (pwm.counterX * coeff >= stopValue) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
-            currentValue = (pwm.counterX) / coeff;
+            currentValue = (pwm.counter) / coeff;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::STOP_X;
             Udp::pThis->reply.val = currentValue;
         } else {
+            fast_slow(Dir::PLUS);
             // TODO: send currentValue
             if (previousValue != currentValue) {
                 Udp::pThis->MustSend = true;
@@ -245,15 +304,14 @@ void StepX::handler() {
                 Udp::pThis->reply.currentReply = Protocol::LIMIT_X_MINUS;
                 Udp::pThis->reply.val = currentValue;
             }
-            //if (getLimitPlus()) {
-            //    stop();
-            //    currentState = STOP;
-            //    // send signal about final place
-            //    Udp::pThis->MustSend = true;
-            //    Udp::pThis->reply.currentReply = Protocol::LIMIT_X_PLUS;
-            //    Udp::pThis->reply.val = currentValue;
-            //}
-
+            // if (getLimitPlus()) {
+            //     stop();
+            //     currentState = STOP;
+            //     // send signal about final place
+            //     Udp::pThis->MustSend = true;
+            //     Udp::pThis->reply.currentReply = Protocol::LIMIT_X_PLUS;
+            //     Udp::pThis->reply.val = currentValue;
+            // }
         }
         break;
     default:

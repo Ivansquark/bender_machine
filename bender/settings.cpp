@@ -17,7 +17,7 @@ void Settings::firstSendSettings(const Protocol::CommandSet& val) {
     currentCommandSet.coefX = val.coefX;
     currentCommandSet.deviationY = val.deviationY;
     currentCommandSet.deviationX = val.deviationX;
-    emit sendSetData(currentCommandSet);
+    emit sendSetData(false, currentCommandSet);
 }
 
 void Settings::init() {
@@ -81,7 +81,7 @@ void Settings::init() {
         currentCommandSet.coefX = spinCoefX->value();
         currentCommandSet.deviationY = spinDeviationY->value();
         currentCommandSet.deviationX = spinDeviationX->value();
-        emit sendSetData(currentCommandSet);
+        emit sendSetData(true, currentCommandSet);
     });
     connect(butGet, &QPushButton::clicked, [this] { emit sendGetData(); });
     butExit->setFixedSize(100, 100);

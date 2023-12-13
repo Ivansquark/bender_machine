@@ -4,8 +4,9 @@
 #include <QByteArray>
 #include <QDebug>
 #include <QObject>
-#include <filesystem>
+//#include <filesystem>
 #include <fstream>
+#include <stdint.h>
 
 class Fileops : public QObject {
     Q_OBJECT

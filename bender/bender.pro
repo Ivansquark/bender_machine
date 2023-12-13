@@ -1,4 +1,4 @@
-QT       += core gui serialport network
+QT       += core gui network
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -18,7 +18,7 @@ SOURCES += \
     protocol.cpp \
     screen.cpp \
     settings.cpp \
-    uart.cpp \
+    touch.cpp \
     udp.cpp \
     valtostr.cpp
 
@@ -32,7 +32,7 @@ HEADERS += \
     screen.h \
     settings.h \
     style.h \
-    uart.h \
+    touch.h \
     udp.h \
     valtostr.h
 

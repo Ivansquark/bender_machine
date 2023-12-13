@@ -1,3 +1,6 @@
 build-bender-Desktop-Debug
 build-bender-Desktop-Profile
 build-bender-Desktop-Release
+build-bender-raspy3-Debug
+build-bender-raspy3-Release
+build-bender-raspy3-Profile

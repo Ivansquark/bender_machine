@@ -22,7 +22,7 @@ class Settings : public QDialog {
 
   signals:
     void sendGetData();
-    void sendSetData(const Protocol::CommandSet&);
+    void sendSetData(bool IsNeedTooWriteInFile, const Protocol::CommandSet&);
 
   private slots:
 

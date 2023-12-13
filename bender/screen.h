@@ -8,8 +8,11 @@
 #include "programs.h"
 #include "settings.h"
 #include "valtostr.h"
+#include "touch.h"
 
 #include <QDialog>
+#include <QWindow>
+#include <QMainWindow>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QMouseEvent>
@@ -141,9 +144,16 @@ class Screen : public QDialog {
     //---------------- Settings -----------------------------------------------
     std::unique_ptr<Settings> set = std::make_unique<Settings>(this);
 
+    //---------------- Touch handling -----------------------------------------
+    std::unique_ptr<Touch> touch = std::make_unique<Touch>(this);
+
     //---------------- Mouse handling -----------------------------------------
   protected:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
+  protected:
+    //bool event(QEvent *ev) override;
+
+    //void touchEvent(QTouchEvent *ev);
 };
 #endif // SCREEN_H

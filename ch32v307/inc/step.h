@@ -25,8 +25,9 @@ class StepY {
     void startMinus();
     void stop();
     bool isStopped();
-    inline uint32_t getCounterPWM() {return pwm.counterY;}
+    inline uint32_t getCounterPWM() {return pwm.counter;}
 
+    uint32_t startValue = 0;
     uint32_t stopValue = 0;
     uint32_t currentValue = 0;
     uint32_t previousValue = 0;
@@ -36,7 +37,7 @@ class StepY {
     inline bool getLimitPlus() { return !konc.getState(); }
     inline bool getLimitMinus() { return !zerro.getState(); }
 
-    inline void clearPwmCounter() {pwm.counterY = 0;}
+    inline void clearPwmCounter() {pwm.counter = 0;}
 
     uint32_t coeff = COEFF_PWM_TO_MM;
     static constexpr uint32_t COEFF_PWM_TO_MM = 100;
@@ -45,13 +46,19 @@ class StepY {
 
   private:
     // void init();
+    //
+    enum Dir{
+        PLUS,
+        MINUS
+    };
+    void fast_slow(Dir dir);
 
     inline void enableOn() { en.setLow(); }
     inline void enableOff() { en.setHigh(); }
     inline void dirOn() { dir.setHigh(); }
     inline void dirOff() { dir.setLow(); }
 
-    Pwm pwm;
+    PwmY pwm;
     //Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> en;
     //Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> dir;
     Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> dir;
@@ -67,6 +74,8 @@ class StepY {
     Gpios::In<Gpios::PA, 1, Gpios::InitModeIn::FLOATING> konc;
     Gpios::In<Gpios::PC, 0, Gpios::InitModeIn::FLOATING> rezerv1;
     Gpios::In<Gpios::PC, 2, Gpios::InitModeIn::FLOATING> rezerv2;
+
+    static constexpr uint32_t NUM_STEPS_FOR_SPEED_CHANGE = 100;
 };
 
 class StepX {
@@ -86,8 +95,9 @@ class StepX {
     void startMinus();
     void stop();
     bool isStopped();
-    inline uint32_t getCounterPWM() {return pwm.counterX;}
+    inline uint32_t getCounterPWM() {return pwm.counter;}
 
+    uint32_t startValue = 0;
     uint32_t stopValue = 0;
     uint32_t currentValue = 0;
     uint32_t previousValue = 0;
@@ -97,7 +107,7 @@ class StepX {
     inline bool getLimitPlus() { return !konc.getState(); }
     inline bool getLimitMinus() { return !zerro.getState(); }
 
-    inline void clearPwmCounter() {pwm.counterX = 0;}
+    inline void clearPwmCounter() {pwm.counter = 0;}
 
     uint32_t coeff = COEFF_PWM_TO_MM;
     static constexpr uint32_t COEFF_PWM_TO_MM = 100;
@@ -106,13 +116,19 @@ class StepX {
 
   private:
     void init();
+    
+    enum Dir{
+        PLUS,
+        MINUS
+    };
+    void fast_slow(Dir dir);
 
     inline void enableOn() { en.setLow(); }
     inline void enableOff() { en.setHigh(); }
     inline void dirOn() { dir.setHigh(); }
     inline void dirOff() { dir.setLow(); }
 
-    Pwm pwm;
+    PwmX pwm;
     //Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> en;
     //Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> dir;
     Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> dir;
@@ -121,5 +137,6 @@ class StepX {
     Gpios::In<Gpios::PE, 2, Gpios::InitModeIn::FLOATING> zerro;
     Gpios::In<Gpios::PE, 4, Gpios::InitModeIn::FLOATING> otstup;
     Gpios::In<Gpios::PE, 6, Gpios::InitModeIn::FLOATING> konc;
+    static constexpr uint32_t NUM_STEPS_FOR_SPEED_CHANGE = 100;
 };
 #endif // STEPH
