@@ -1,4 +1,5 @@
 #include "interface.h"
+#include <QThread>
 
 Interface::Interface(QObject* parent) : QObject(parent) {
     connect(udp.get(), &Udp::sendData, this, &Interface::receiveData);
@@ -24,7 +25,7 @@ void Interface::sendData(const Protocol::Command& command) {
     arr.append((uint8_t)(currentCommand.val >> 8));
     arr.append((uint8_t)(currentCommand.val));
     udp->sendDataToUdp(arr);
-    timerReply.start(100);
+    timerReply.start(200);
     // if usb ...
 }
 
@@ -83,13 +84,18 @@ void Interface::receiveData(const QByteArray& arr) {
     } else if (arr[1] == Protocol::Replies::REPLY_CONTROLLER) {
         IsNotReplied = false;
         timerReply.stop();
+    } else if (arr[1] == Protocol::Replies::NEED_CALIBRATION) {
+        currentReply.currentReply = (Protocol::Replies)arr[1];
+        sendReply();
+        //QThread::usleep(1000);
+        emit sendCurrentReply(currentReply);
     } else {
         currentReply.currentReply = (Protocol::Replies)arr[1];
         currentReply.val =
             (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
                        ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
         if (currentReply.val > 99999) {
-            qDebug() << (uint8_t)arr[2];
+            //qDebug() << (uint8_t)arr[2];
         }
         sendReply();
         emit sendCurrentReply(currentReply);

@@ -93,7 +93,7 @@ void StateMachine::handler() {
                 udp.sendData(udp.reply);
             }
             udp.WaitForReply = true;
-            timerReplyStart(100);
+            timerReplyStart(200);
         }
     }
     //--------------  resend handler  -----------------------------------------
@@ -102,7 +102,7 @@ void StateMachine::handler() {
         udp.MustResend = false;
         udp.sendData(udp.reply);
         udp.WaitForReply = true;
-        timerReplyStart(100);
+        timerReplyStart(200);
     }
 }
 //------------------- parse received data -------------------------------------

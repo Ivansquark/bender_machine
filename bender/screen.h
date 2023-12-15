@@ -7,18 +7,18 @@
 #include "keyboard.h"
 #include "programs.h"
 #include "settings.h"
-#include "valtostr.h"
 #include "touch.h"
+#include "valtostr.h"
 
 #include <QDialog>
-#include <QWindow>
-#include <QMainWindow>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QMainWindow>
 #include <QMouseEvent>
 #include <QPushButton>
 #include <QThread>
 #include <QVBoxLayout>
+#include <QWindow>
 #include <memory.h>
 
 class Screen : public QDialog {
@@ -58,16 +58,17 @@ class Screen : public QDialog {
 
     void moveCycle();
 
+
   private:
     void addSymbol(char sym);
-    QLabel* labSetPosY = new QLabel("SetY", this);
+    QLabel* labSetPosY = new QLabel("0", this);
     QLabel* labInfoY = new QLabel("NEED CALIBRATION", this);
-    QLabel* labPosY = new QLabel("Y", this);
-    QLabel* labGetPosY = new QLabel("GetY", this);
-    QLabel* labSetPosX = new QLabel("SetX", this);
+    QLabel* labPosY = new QLabel("|  Y", this);
+    QLabel* labGetPosY = new QLabel("0", this);
+    QLabel* labSetPosX = new QLabel("0", this);
     QLabel* labInfoX = new QLabel("___", this);
-    QLabel* labPosX = new QLabel("X", this);
-    QLabel* labGetPosX = new QLabel("GetX", this);
+    QLabel* labPosX = new QLabel("-- X", this);
+    QLabel* labGetPosX = new QLabel("0", this);
 
     QVBoxLayout* layVleftY = new QVBoxLayout();
     QVBoxLayout* layVleftX = new QVBoxLayout();
@@ -131,8 +132,11 @@ class Screen : public QDialog {
     std::unique_ptr<QTimer> timerForAutoSend = std::make_unique<QTimer>();
     std::unique_ptr<QTimer> timerWaitForSaveInFile = std::make_unique<QTimer>();
     static constexpr uint32_t TIME_TO_PRESS = 200;
-    static constexpr uint32_t TIME_TO_AUTO_SEND = 5;
+    static constexpr uint32_t TIME_TO_AUTO_SEND = 90;
     static constexpr uint32_t TIME_TO_SAVE_IN_FILE = 100;
+
+
+
     //---------------- Calibration --------------------------------------------
     bool IsCalibrated = false;
     void setCalibrationState(bool state);
@@ -140,20 +144,20 @@ class Screen : public QDialog {
     void setManualMoovement(bool state);
     bool IsPlusPressed = false;
     bool IsMinusPressed = false;
-
+    bool WasXStopped = false;
+    bool WasYStopped = false;
     //---------------- Settings -----------------------------------------------
     std::unique_ptr<Settings> set = std::make_unique<Settings>(this);
 
-    //---------------- Touch handling -----------------------------------------
-    std::unique_ptr<Touch> touch = std::make_unique<Touch>(this);
 
     //---------------- Mouse handling -----------------------------------------
   protected:
     void mousePressEvent(QMouseEvent* event);
     void mouseReleaseEvent(QMouseEvent* event);
-  protected:
-    //bool event(QEvent *ev) override;
 
-    //void touchEvent(QTouchEvent *ev);
+  protected:
+    // bool event(QEvent *ev) override;
+
+    // void touchEvent(QTouchEvent *ev);
 };
 #endif // SCREEN_H

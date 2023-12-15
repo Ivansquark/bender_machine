@@ -55,7 +55,7 @@ extern volatile uint8_t net_data_led_require;
 //MEMB_EXTERN(ch307_mac_rec_frame_mem);
 class Eth {
   public:
-    Eth(uint8_t ip0 = 192, uint8_t ip1 = 168, uint8_t ip2 = 1, uint8_t ip3 = 6);
+    Eth(uint8_t ip0 = 192, uint8_t ip1 = 168, uint8_t ip2 = 1, uint8_t ip3 = 5);
     static Eth* pThis;
     // @fn      ETH_RxPkt_ChainMode
     // @brief   MAC receive a ethernet frame in chain mode.

@@ -16,8 +16,11 @@ Screen::~Screen() {
 
 void Screen::init() {
     // setFixedSize(1024, 600);
-
+    setStyleSheet(Style::BackgroundMain);
     // connect(butExit, &QPushButton::clicked, [this] { close(); });
+    //labGetPosY->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
+    labGetPosY->setMaximumWidth(170);
+    labGetPosX->setMaximumWidth(170);
     layVleftY->addWidget(labSetPosY);
     layVleftY->addWidget(labInfoY);
     layVleftY->addWidget(labPosY);
@@ -29,6 +32,7 @@ void Screen::init() {
     layVright->addWidget(programs);
     layVright->addStretch(0);
     layVright->addWidget(keyboard);
+    //layVright->setStretch(1,1);
     // layVright->addWidget(butExit);
     layH->addLayout(layVleftY);
     layH->addLayout(layVleftX);
@@ -60,6 +64,8 @@ void Screen::init() {
     labSetPosX->setText(*strTempValX);
     labSetPosY->setStyleSheet(Style::TextTemp);
     labSetPosY->setText(*strTempValY);
+    labGetPosX->setStyleSheet(Style::TextCurrent);
+    labGetPosY->setStyleSheet(Style::TextCurrent);
     //! TODO: check eeprom programs
     //-------------- programs -------------------------------------------------
     // get last values
@@ -104,12 +110,13 @@ void Screen::init() {
     //----------------- BUT PLUS MINUS ----------------------------------------
     connect(control, &Control::onButPlusPressed, [this] {
         IsPlusPressed = true;
+        IsMinusPressed = false;
         getYX();
         if (currentMoveXorY == MoveXorY::Y) {
             labSetPosY->setStyleSheet(Style::TextMove);
-            qDebug() << "currentY" << currentY;
+            // qDebug() << "currentY" << currentY;
             currentCommand.val = ++currentY;
-            qDebug() << "++currentY" << currentY << currentCommand.val;
+            // qDebug() << "++currentY" << currentY << currentCommand.val;
             currentCommand.currentCommand = Protocol::Commands::SEND_Y_PLUS;
             interface->sendData(currentCommand);
             timerWaitForPress->stop();
@@ -125,20 +132,20 @@ void Screen::init() {
     });
     connect(control, &Control::onButPlusReleased, [this] {
         IsPlusPressed = false;
+        IsMinusPressed = false;
         timerForAutoSend->stop();
         timerWaitForPress->stop();
     });
 
     connect(control, &Control::onButMinusPressed, [this] {
         IsMinusPressed = true;
+        IsPlusPressed = false;
         getYX();
         if (currentMoveXorY == MoveXorY::Y) {
             labSetPosY->setStyleSheet(Style::TextMove);
-            // qDebug() << "currentY" << currentY;
             if (currentY > 0) {
                 currentCommand.val = --currentY;
             }
-            // qDebug() << "--currentY" << currentY << currentCommand.val;
             currentCommand.currentCommand = Protocol::Commands::SEND_Y_MINUS;
             interface->sendData(currentCommand);
             timerWaitForPress->stop();
@@ -156,6 +163,7 @@ void Screen::init() {
     });
     connect(control, &Control::onButMinusReleased, [this] {
         IsMinusPressed = false;
+        IsPlusPressed = false;
         timerForAutoSend->stop();
         timerWaitForPress->stop();
     });
@@ -165,6 +173,8 @@ void Screen::init() {
             currentCommand.currentCommand =
                 Protocol::Commands::SEND_CALIBRATION_START;
             interface->sendData(currentCommand);
+            control->setButDashColor(true);
+            //qDebug() << "onButDashPressed";
         }
     });
     connect(control, &Control::onButDashReleased, [this] {
@@ -172,6 +182,8 @@ void Screen::init() {
             currentCommand.currentCommand =
                 Protocol::Commands::SEND_CALIBRATION_STOP;
             interface->sendData(currentCommand);
+            control->setButDashColor(false);
+            //qDebug() << "onButDashReleased";
         }
     });
     //-------------- interface ------------------------------------------------
@@ -183,7 +195,7 @@ void Screen::init() {
     timerForAutoSend->setSingleShot(true);
     // connect(&moveTimer, &QTimer::timeout, this, &Screen::moveCycle);
     connect(timerWaitForPress.get(), &QTimer::timeout, [this] {
-        qDebug() << "Timer pressd timeout";
+        // qDebug() << "Timer pressd timeout";
         if (IsPlusPressed || IsMinusPressed) {
             timerForAutoSend->start(TIME_TO_AUTO_SEND);
         }
@@ -198,41 +210,52 @@ void Screen::init() {
             labSetPosX->setStyleSheet(Style::TextMove);
             if (IsPlusPressed) {
                 // getYX();
-                currentCommand.val = ++currentX;
-                // qDebug() << "--currentY" << currentY << currentCommand.val;
-                currentCommand.currentCommand = Protocol::Commands::SEND_X_PLUS;
-                interface->sendData(currentCommand);
-                timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                //if (WasXStopped) {
+                    currentCommand.val = ++currentX;
+                    currentCommand.currentCommand =
+                        Protocol::Commands::SEND_X_PLUS;
+                    interface->sendData(currentCommand);
+                    timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                    WasXStopped = false;
+                //}
             } else if (IsMinusPressed) {
                 // getYX();
-                if (currentX > 0) {
-                    currentCommand.val = --currentX;
-                }
-                // qDebug() << "--currentY" << currentY << currentCommand.val;
-                currentCommand.currentCommand =
-                    Protocol::Commands::SEND_X_MINUS;
-                interface->sendData(currentCommand);
-                timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                //if (WasXStopped) {
+                    if (currentX > 0) {
+                        currentCommand.val = --currentX;
+                    }
+                    // qDebug() << "--currentY" << currentY <<
+                    // currentCommand.val;
+                    currentCommand.currentCommand =
+                        Protocol::Commands::SEND_X_MINUS;
+                    interface->sendData(currentCommand);
+                    timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                    WasXStopped = false;
+                //}
             }
         } else if (currentMoveXorY == MoveXorY::Y) {
             labSetPosY->setStyleSheet(Style::TextMove);
             if (IsPlusPressed) {
-                // getYX();
-                currentCommand.val = ++currentY;
-                // qDebug() << "--currentY" << currentY << currentCommand.val;
-                currentCommand.currentCommand = Protocol::Commands::SEND_Y_PLUS;
-                interface->sendData(currentCommand);
-                timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                //if (WasYStopped) {
+                    currentCommand.val = ++currentY;
+                    currentCommand.currentCommand =
+                        Protocol::Commands::SEND_Y_PLUS;
+                    interface->sendData(currentCommand);
+                    timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                    WasYStopped = false;
+                //}
+
             } else if (IsMinusPressed) {
-                // getYX();
-                if (currentY > 0) {
-                    currentCommand.val = --currentY;
-                }
-                // qDebug() << "--currentY" << currentY << currentCommand.val;
-                currentCommand.currentCommand =
-                    Protocol::Commands::SEND_Y_MINUS;
-                interface->sendData(currentCommand);
-                timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                //if (WasYStopped) {
+                    if (currentY > 0) {
+                        currentCommand.val = --currentY;
+                    }
+                    currentCommand.currentCommand =
+                        Protocol::Commands::SEND_Y_MINUS;
+                    interface->sendData(currentCommand);
+                    timerForAutoSend->start(TIME_TO_AUTO_SEND);
+                    WasYStopped = false;
+                //}
             }
         }
         timerWaitForSaveInFile->stop();
@@ -284,6 +307,10 @@ void Screen::setCalibrationState(bool state) {
     control->setEnabledCalibration(state);
     labInfoX->setVisible(state);
     labInfoY->setVisible(state);
+    IsCalibrated = !state;
+    if(state) {
+        control->setButDashColor(false);
+    }
 }
 
 void Screen::setManualMoovement(bool state) {
@@ -302,7 +329,7 @@ void Screen::mousePressEvent(QMouseEvent* event) {
         event->pos().x() <= labSetPosY->x() + labSetPosY->width() &&
         event->pos().y() >= labSetPosY->y() &&
         event->pos().y() <= labSetPosY->y() + labSetPosY->height()) {
-        qDebug() << "On label pressed";
+        // qDebug() << "On label pressed";
         if (currentMoveXorY == MoveXorY::Y || currentMoveXorY == MoveXorY::X) {
             currentMoveXorY = MoveXorY::NONE;
             labSetPosY->setStyleSheet(Style::TextFinal);
@@ -317,7 +344,7 @@ void Screen::mousePressEvent(QMouseEvent* event) {
                event->pos().x() <= labSetPosX->x() + labSetPosX->width() &&
                event->pos().y() >= labSetPosX->y() &&
                event->pos().y() <= labSetPosX->y() + labSetPosX->height()) {
-        qDebug() << "On label pressed";
+        // qDebug() << "On label pressed";
         if (currentMoveXorY == MoveXorY::X || currentMoveXorY == MoveXorY::Y) {
             currentMoveXorY = MoveXorY::NONE;
             labSetPosX->setStyleSheet(Style::TextFinal);
@@ -337,7 +364,7 @@ void Screen::mousePressEvent(QMouseEvent* event) {
 
         if (IsCalibrated) return;
         set->setModal(true);
-        set->show();
+        set->showFullScreen();
     }
     //    if (event->pos().x() >= control->butDash->x() &&
     //        event->pos().x() <= control->butDash->x() +
@@ -371,19 +398,19 @@ void Screen::mouseReleaseEvent([[maybe_unused]] QMouseEvent* event) {
 //     }
 // }
 
-//bool Screen::event(QEvent* ev) {
-//    qDebug() << "event" << ev->type();
-//    switch (ev->type()) {
-//    case QEvent::TouchBegin:
-//        qDebug() << "TouchBegin";
-//        break;
-//    case QEvent::TouchEnd:
-//        qDebug() << "TouchEnd";
-//        break;
-//    default:
-//        return ev;
-//    }
-//}
+// bool Screen::event(QEvent* ev) {
+//     qDebug() << "event" << ev->type();
+//     switch (ev->type()) {
+//     case QEvent::TouchBegin:
+//         qDebug() << "TouchBegin";
+//         break;
+//     case QEvent::TouchEnd:
+//         qDebug() << "TouchEnd";
+//         break;
+//     default:
+//         return ev;
+//     }
+// }
 
 void Screen::addSymbol(char sym) {
     if (currentXorY == XorY::X) {
@@ -516,19 +543,19 @@ void Screen::onButStartReleased() {
 void Screen::getCurrentReply(const Protocol::Reply& reply) {
     switch (reply.currentReply) {
     case Protocol::Replies::START_X:
-        qDebug() << "Get: Replies::START_X" << reply.val;
+        // qDebug() << "Get: Replies::START_X" << reply.val;
         break;
     case Protocol::Replies::START_Y:
-        qDebug() << "Get: Replies::START_Y" << reply.val;
+        // qDebug() << "Get: Replies::START_Y" << reply.val;
         break;
     case Protocol::Replies::VAL_X:
-        qDebug() << "Get: Replies::VAL_X" << reply.val;
+        // qDebug() << "Get: Replies::VAL_X" << reply.val;
         break;
     case Protocol::Replies::VAL_Y:
-        qDebug() << "Get: Replies::VAL_Y" << reply.val;
+        // qDebug() << "Get: Replies::VAL_Y" << reply.val;
         break;
     case Protocol::Replies::CURRENT_Y:
-        qDebug() << "Get: Replies::CURRENT_Y" << reply.val;
+        // qDebug() << "Get: Replies::CURRENT_Y" << reply.val;
         labGetPosY->setText(valToStr.valYToString(reply.val));
         if (currentXorY == XorY::Y) {
             currentY = reply.val;
@@ -537,7 +564,7 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         }
         break;
     case Protocol::Replies::CURRENT_X:
-        qDebug() << "Get: Replies::CURRENT_X" << reply.val;
+        // qDebug() << "Get: Replies::CURRENT_X" << reply.val;
         labGetPosX->setText(valToStr.valXToString(reply.val));
         if (currentXorY == XorY::X) {
             currentX = reply.val;
@@ -546,24 +573,24 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         }
         break;
     case Protocol::Replies::LIMIT_Y_PLUS:
-        qDebug() << "Get: Replies::LIMIT_Y_PLUS" << reply.val;
+        // qDebug() << "Get: Replies::LIMIT_Y_PLUS" << reply.val;
         labGetPosY->setText(valToStr.valYToString(reply.val));
         //
         break;
     case Protocol::Replies::LIMIT_Y_MINUS:
-        qDebug() << "Get: Replies::LIMIT_Y_MINUS" << reply.val;
+        // qDebug() << "Get: Replies::LIMIT_Y_MINUS" << reply.val;
         labGetPosY->setText(valToStr.valYToString(reply.val));
         break;
     case Protocol::Replies::LIMIT_X_PLUS:
-        qDebug() << "Get: Replies::LIMIT_X_PLUS" << reply.val;
+        // qDebug() << "Get: Replies::LIMIT_X_PLUS" << reply.val;
         labGetPosX->setText(valToStr.valXToString(reply.val));
         break;
     case Protocol::Replies::LIMIT_X_MINUS:
-        qDebug() << "Get: Replies::LIMIT_X_MINUS" << reply.val;
+        // qDebug() << "Get: Replies::LIMIT_X_MINUS" << reply.val;
         labGetPosX->setText(valToStr.valXToString(reply.val));
         break;
     case Protocol::Replies::STOP_X:
-        qDebug() << "Get: Replies::STOP_X" << reply.val;
+        // qDebug() << "Get: Replies::STOP_X" << reply.val;
         labGetPosX->setText(valToStr.valXToString(reply.val));
         if (currentMoveXorY == MoveXorY::X) {
             currentX = reply.val;
@@ -571,6 +598,7 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
             labSetPosX->setText(valToStr.valXToString(currentX));
             timerWaitForSaveInFile->stop();
             timerWaitForSaveInFile->start(TIME_TO_SAVE_IN_FILE);
+            WasXStopped = true;
         } else if (currentMoveXorY == MoveXorY::NONE) {
             currentCommand.currentCommand = Protocol::SEND_START_Y;
             currentCommand.val = currentY;
@@ -578,7 +606,8 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         }
         break;
     case Protocol::Replies::STOP_Y:
-        qDebug() << "Get: Replies::STOP_Y" << reply.val;
+        WasYStopped = true;
+        // qDebug() << "Get: Replies::STOP_Y" << reply.val;
         labGetPosY->setText(valToStr.valYToString(reply.val));
         if (currentMoveXorY == MoveXorY::Y) {
             currentY = reply.val;
@@ -590,26 +619,27 @@ void Screen::getCurrentReply(const Protocol::Reply& reply) {
         control->setStart(false);
         break;
     case Protocol::Replies::CALIBRATION_START:
-        qDebug() << "CALIBRATION_START" << reply.val;
+        // qDebug() << "CALIBRATION_START" << reply.val;
         labInfoY->setText("Calibration X started");
         break;
     case Protocol::Replies::CALIBRATION_X_STOP:
-        qDebug() << "Get: Replies::CALIBRATION_X_STOP" << reply.val;
+        // qDebug() << "Get: Replies::CALIBRATION_X_STOP" << reply.val;
         labInfoY->setText("Calibration Y started");
         break;
     case Protocol::Replies::CALIBRATION_Y_STOP:
-        qDebug() << "Get: Replies::CALIBRATION_Y_STOP" << reply.val;
+        // qDebug() << "Get: Replies::CALIBRATION_Y_STOP" << reply.val;
         labInfoY->setText("Calibration OK");
         currentX = 0;
         currentY = 0;
         labGetPosX->setText(valToStr.valXToString(currentX));
         labGetPosY->setText(valToStr.valYToString(currentY));
+        IsCalibrated = true;
         setCalibrationState(false);
         setManualMoovement(false);
         break;
     case Protocol::Replies::NEED_CALIBRATION: {
-        qDebug() << "Get: Replies::CALIBRATION_X_STOP" << reply.val;
-        labInfoY->setText("Calibration Y started");
+        // qDebug() << "Get: Replies:: NEED_CALIBRATION" << reply.val;
+        labInfoY->setText("Calibration need started");
         IsCalibrated = false;
         setCalibrationState(true);
         // TODO: send settings from file

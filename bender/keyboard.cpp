@@ -36,6 +36,15 @@ void Keyboard::init() {
 
     layH1->addWidget(butEnter);
     layH1->addLayout(layV1);
+    butEnter->setFixedWidth(80);
+    butX->setFixedWidth(80);
+    butY->setFixedWidth(80);
+    //butX->setFixedHeight(80);
+    butY->setMinimumHeight(50);
+    QList<QPushButton*> listButtons = this->findChildren<QPushButton*>();
+    for (auto it = listButtons.begin(); it != listButtons.end(); ++it) {
+        (*it)->setMinimumHeight(43);
+    }
 
     layH1_1->addWidget(but7);
     layH1_1->addWidget(but8);

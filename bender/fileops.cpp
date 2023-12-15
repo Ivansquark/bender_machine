@@ -87,7 +87,7 @@ Fileops::Pauto Fileops::getFilePauto() {
     if (file.is_open()) {
         std::string line;
         getline(file, line);
-        qDebug() << line.data();
+        //qDebug() << line.data();
         currentPauto = (Pauto)std::stoi(line);
         file.close();
     }

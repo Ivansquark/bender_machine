@@ -2,12 +2,14 @@
 #define CONTROL_H
 
 #include "fileops.h"
+#include "touch.h"
 
 #include <QHBoxLayout>
 #include <QPushButton>
 #include <QRadioButton>
 #include <QVBoxLayout>
 #include <QWidget>
+#include <QTimer>
 
 class Control : public QWidget {
     Q_OBJECT
@@ -24,6 +26,7 @@ class Control : public QWidget {
   public:
     void setPmode(Fileops::Pmode mode);
     void setPauto(Fileops::Pauto autoState);
+    void setButDashColor(bool state);
   signals:
     void onButStartPressed();
     void onButStartReleased();
@@ -38,6 +41,10 @@ class Control : public QWidget {
     void onButDashPressed();
     void onButDashReleased();
 
+  public slots:
+    void getTouchCoord(bool WasPressed, uint16_t x, uint16_t y);
+  private slots:
+    void timeoutPressed();
   private:
     QVBoxLayout* layV = new QVBoxLayout;
     QHBoxLayout* layH1 = new QHBoxLayout;
@@ -61,6 +68,27 @@ class Control : public QWidget {
     QPushButton* butPlus = new QPushButton("+", this);
     QPushButton* butMinus = new QPushButton("-", this);
     QPushButton* butDash = new QPushButton("__", this);
+    QPoint butStartParentPos;
+    QPoint butPlusParentPos;
+    QPoint butMinusParentPos;
+    QPoint butDashParentPos;
+
+    Fileops::Pauto currentAutoState = Fileops::Pauto::MANUAL;
+
+    //---------------- Touch handling -----------------------------------------
+    std::unique_ptr<Touch> touch = std::make_unique<Touch>(this);
+    bool CheckPressed = false;
+    bool IsPressed = false;
+    bool IsButStartPressed = false;
+    bool IsButPlusPressed = false;
+    bool IsButMinusPressed = false;
+    bool IsButDashPressed = false;
+    uint16_t X = 0;
+    uint16_t Y = 0;
+    uint8_t counterAdc = 0;
+    static constexpr uint8_t COUNTER_ADC_MAX = 5;
+    //---------------- timer --------------------------------------------------
+    std::unique_ptr<QTimer> timPressed = std::make_unique<QTimer>(this);
 };
 
 #endif // CONTROL_H
