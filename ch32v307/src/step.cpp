@@ -287,7 +287,7 @@ void StepX::handler() {
             Udp::pThis->reply.currentReply = Protocol::STOP_X;
             Udp::pThis->reply.val = currentValue;
         } else {
-            fast_slow(Dir::PLUS);
+            fast_slow(Dir::MINUS);
             // TODO: send currentValue
             if (previousValue != currentValue) {
                 Udp::pThis->MustSend = true;

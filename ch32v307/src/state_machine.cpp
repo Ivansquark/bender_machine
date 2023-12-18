@@ -193,6 +193,7 @@ void StateMachine::calibrationHandler() {
             stepX.stop();
             stepX.currentValue = 0;
             stepX.clearPwmCounter();
+            for(volatile int i = 0; i < 10000000; i++) {}
             currentCalibrationState = CAL_X_DEVIATION_START;
             // currentCalibrationState = CAL_X_STOP;
         }
@@ -226,6 +227,7 @@ void StateMachine::calibrationHandler() {
             stepY.stop();
             stepY.currentValue = 0;
             stepY.clearPwmCounter();
+            for(volatile int i = 0; i < 10000000; i++) {}
             currentCalibrationState = CAL_Y_DEVIATION_START;
             // currentCalibrationState = CAL_Y_STOP;
         }

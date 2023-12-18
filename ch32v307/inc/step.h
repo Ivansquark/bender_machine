@@ -75,7 +75,7 @@ class StepY {
     Gpios::In<Gpios::PC, 0, Gpios::InitModeIn::FLOATING> rezerv1;
     Gpios::In<Gpios::PC, 2, Gpios::InitModeIn::FLOATING> rezerv2;
 
-    static constexpr uint32_t NUM_STEPS_FOR_SPEED_CHANGE = 100;
+    static constexpr uint32_t NUM_STEPS_FOR_SPEED_CHANGE = 50;
 };
 
 class StepX {
@@ -137,6 +137,6 @@ class StepX {
     Gpios::In<Gpios::PE, 2, Gpios::InitModeIn::FLOATING> zerro;
     Gpios::In<Gpios::PE, 4, Gpios::InitModeIn::FLOATING> otstup;
     Gpios::In<Gpios::PE, 6, Gpios::InitModeIn::FLOATING> konc;
-    static constexpr uint32_t NUM_STEPS_FOR_SPEED_CHANGE = 100;
+    static constexpr uint32_t NUM_STEPS_FOR_SPEED_CHANGE = 50;
 };
 #endif // STEPH
