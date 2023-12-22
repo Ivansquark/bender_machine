@@ -59,16 +59,16 @@ struct Reply {
 
 struct CommandSet {
     Commands currentCommand;
-    uint32_t coefY;
-    uint32_t coefX;
+    float coefY;
+    float coefX;
     uint32_t deviationY;
     uint32_t deviationX;
 };
 
 struct ReplySet {
     Replies currentReply;
-    uint32_t coefY;
-    uint32_t coefX;
+    float coefY;
+    float coefX;
     uint32_t deviationY;
     uint32_t deviationX;
 };

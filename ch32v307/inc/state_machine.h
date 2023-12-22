@@ -41,7 +41,8 @@ class StateMachine {
         CAL_X_DEVIATION,
         CAL_X_STOP,
         CAL_Y_START,
-        CAL_Y,
+        CAL_Y_TO_LIMIT_PLUS,
+        CAL_Y_TO_LIMIT_OTSTUP,
         CAL_Y_DEVIATION_START,
         CAL_Y_DEVIATION,
         CAL_Y_STOP

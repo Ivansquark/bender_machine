@@ -32,17 +32,18 @@ void Interface::sendData(const Protocol::Command& command) {
 void Interface::sendDataSettings(const Protocol::CommandSet& data) {
     // if udp
     currentCommandSet = data;
+
     QByteArray arr;
     arr.append(Protocol::TO);
     arr.append((uint8_t)currentCommandSet.currentCommand);
-    arr.append((uint8_t)(currentCommandSet.coefY >> 24));
-    arr.append((uint8_t)(currentCommandSet.coefY >> 16));
-    arr.append((uint8_t)(currentCommandSet.coefY >> 8));
-    arr.append((uint8_t)(currentCommandSet.coefY));
-    arr.append((uint8_t)(currentCommandSet.coefX >> 24));
-    arr.append((uint8_t)(currentCommandSet.coefX >> 16));
-    arr.append((uint8_t)(currentCommandSet.coefX >> 8));
-    arr.append((uint8_t)(currentCommandSet.coefX));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 24));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 16));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 8));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY)));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 24));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 16));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 8));
+    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX)));
     arr.append((uint8_t)(currentCommandSet.deviationY >> 24));
     arr.append((uint8_t)(currentCommandSet.deviationY >> 16));
     arr.append((uint8_t)(currentCommandSet.deviationY >> 8));
@@ -66,12 +67,12 @@ void Interface::receiveData(const QByteArray& arr) {
     // parse data
     if (arr[1] == Protocol::Replies::SETTINGS) {
         currentReplySet.currentReply = (Protocol::Replies)arr[1];
-        currentReplySet.coefY =
+        currentReplySet.coefY = *reinterpret_cast<float*>(
             (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
-                       ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
-        currentReplySet.coefX =
+                       ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]));
+        currentReplySet.coefX = *reinterpret_cast<float*>(
             (uint32_t)(((uint8_t)arr[6] << 24) | ((uint8_t)arr[7] << 16) |
-                       ((uint8_t)arr[8] << 8) | (uint8_t)arr[9]);
+                       ((uint8_t)arr[8] << 8) | (uint8_t)arr[9]));
         currentReplySet.deviationY =
             (uint32_t)(((uint8_t)arr[10] << 24) | ((uint8_t)arr[11] << 16) |
                        ((uint8_t)arr[12] << 8) | (uint8_t)arr[13]);

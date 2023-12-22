@@ -25,7 +25,9 @@ class StepY {
     void startMinus();
     void stop();
     bool isStopped();
-    inline uint32_t getCounterPWM() {return pwm.counter;}
+    inline uint32_t getCounterPWM() { return pwm.counter; }
+    inline void setCounterPWM(uint32_t val) { pwm.counter = val; }
+    inline void clearPwmCounter() { pwm.counter = 0; }
 
     uint32_t startValue = 0;
     uint32_t stopValue = 0;
@@ -34,20 +36,20 @@ class StepY {
 
     void handler();
 
-    inline bool getLimitPlus() { return !konc.getState(); }
-    inline bool getLimitMinus() { return !zerro.getState(); }
+    inline bool getLimitPlus() { return konc.getState(); }
+    inline bool getLimitMinus() { return zerro.getState(); }
+    inline bool getLimitOtstup() { return otstup.getState(); }
 
-    inline void clearPwmCounter() {pwm.counter = 0;}
 
-    uint32_t coeff = COEFF_PWM_TO_MM;
-    static constexpr uint32_t COEFF_PWM_TO_MM = 100;
-    uint32_t deviation = COEFF_PWM_TO_MM;
-    static constexpr uint32_t DEVIATION = 10;
+    float coeff = COEFF_PWM_TO_MM;
+    static constexpr float COEFF_PWM_TO_MM = 119.617F;
+    uint32_t deviation = DEVIATION;
+    static constexpr uint32_t DEVIATION = 50;
 
   private:
     // void init();
     //
-    enum Dir{
+    enum Dir {
         PLUS,
         MINUS
     };
@@ -59,8 +61,8 @@ class StepY {
     inline void dirOff() { dir.setLow(); }
 
     PwmY pwm;
-    //Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> en;
-    //Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> dir;
+    // Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> en;
+    // Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> dir;
     Gpios::Out<Gpios::PD, 10, Gpios::InitModeOut::PUSH_PULL> dir;
     Gpios::Out<Gpios::PD, 8, Gpios::InitModeOut::PUSH_PULL> en;
     Gpios::Out<Gpios::PD, 11, Gpios::InitModeOut::PUSH_PULL> block;
@@ -95,7 +97,9 @@ class StepX {
     void startMinus();
     void stop();
     bool isStopped();
-    inline uint32_t getCounterPWM() {return pwm.counter;}
+    inline uint32_t getCounterPWM() { return pwm.counter; }
+    inline void setCounterPWM(uint32_t val) { pwm.counter = val; }
+    inline void clearPwmCounter() { pwm.counter = 0; }
 
     uint32_t startValue = 0;
     uint32_t stopValue = 0;
@@ -103,21 +107,21 @@ class StepX {
     uint32_t previousValue = 0;
 
     void handler();
-    
-    inline bool getLimitPlus() { return !konc.getState(); }
-    inline bool getLimitMinus() { return !zerro.getState(); }
 
-    inline void clearPwmCounter() {pwm.counter = 0;}
+    inline bool getLimitPlus() { return konc.getState(); }
+    inline bool getLimitMinus() { return zerro.getState(); }
+    inline bool getLimitOtstup() { return otstup.getState(); }
 
-    uint32_t coeff = COEFF_PWM_TO_MM;
-    static constexpr uint32_t COEFF_PWM_TO_MM = 100;
+
+    float coeff = COEFF_PWM_TO_MM;
+    static constexpr float COEFF_PWM_TO_MM = 100.0F;
     uint32_t deviation = COEFF_PWM_TO_MM;
     static constexpr uint32_t DEVIATION = 10;
 
   private:
     void init();
-    
-    enum Dir{
+
+    enum Dir {
         PLUS,
         MINUS
     };
@@ -129,8 +133,8 @@ class StepX {
     inline void dirOff() { dir.setLow(); }
 
     PwmX pwm;
-    //Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> en;
-    //Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> dir;
+    // Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> en;
+    // Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> dir;
     Gpios::Out<Gpios::PE, 10, Gpios::InitModeOut::PUSH_PULL> dir;
     Gpios::Out<Gpios::PE, 12, Gpios::InitModeOut::PUSH_PULL> en;
     Gpios::In<Gpios::PE, 14, Gpios::InitModeIn::FLOATING> err;

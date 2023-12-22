@@ -9,6 +9,7 @@
 #include <QObject>
 #include <QPushButton>
 #include <QSpinBox>
+#include <QDoubleSpinBox>
 #include <QVBoxLayout>
 #include <QWidget>
 
@@ -59,8 +60,8 @@ class Settings : public QDialog {
     QLabel* labCoefY = new QLabel("Coefficient Y", this);
     QSpinBox* spinDeviationX = new QSpinBox(this);
     QSpinBox* spinDeviationY = new QSpinBox(this);
-    QSpinBox* spinCoefX = new QSpinBox(this);
-    QSpinBox* spinCoefY = new QSpinBox(this);
+    QDoubleSpinBox* spinCoefX = new QDoubleSpinBox(this);
+    QDoubleSpinBox* spinCoefY = new QDoubleSpinBox(this);
     QPushButton* butGet = new QPushButton("Get", this);
     QPushButton* butSend = new QPushButton("Send", this);
 

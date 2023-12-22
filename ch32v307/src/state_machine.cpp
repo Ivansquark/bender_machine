@@ -11,7 +11,7 @@ StateMachine::StateMachine() {
     timerCalStart(500);
     // udp.reply.currentReply = Protocol::Replies::NEED_CALIBRATION;
     // udp.MustSend = true;
-    //stepY.startPlus();
+    // stepY.startPlus();
 }
 
 void StateMachine::handler() {
@@ -193,7 +193,7 @@ void StateMachine::calibrationHandler() {
             stepX.stop();
             stepX.currentValue = 0;
             stepX.clearPwmCounter();
-            for(volatile int i = 0; i < 10000000; i++) {}
+            for (volatile int i = 0; i < 10000000; i++) {}
             currentCalibrationState = CAL_X_DEVIATION_START;
             // currentCalibrationState = CAL_X_STOP;
         }
@@ -219,27 +219,40 @@ void StateMachine::calibrationHandler() {
         currentCalibrationState = CAL_Y_START;
         break;
     case CAL_Y_START:
-        stepY.startMinus();
-        currentCalibrationState = CAL_Y;
+        stepY.startPlus();
+        currentCalibrationState = CAL_Y_TO_LIMIT_PLUS;
         break;
-    case CAL_Y:
-        if (stepY.getLimitMinus()) {
+    case CAL_Y_TO_LIMIT_PLUS:
+        if (stepY.getLimitPlus()) {
             stepY.stop();
             stepY.currentValue = 0;
-            stepY.clearPwmCounter();
-            for(volatile int i = 0; i < 10000000; i++) {}
-            currentCalibrationState = CAL_Y_DEVIATION_START;
+            // stepY.clearPwmCounter();
+            for (volatile int i = 0; i < 10000000; i++) {}
+            currentCalibrationState = CAL_Y_TO_LIMIT_OTSTUP;
+            stepY.startMinus();
             // currentCalibrationState = CAL_Y_STOP;
         }
         break;
-    case CAL_Y_DEVIATION_START:
-        stepY.startPlus();
-        stepY.stopValue = stepY.deviation;
+    case CAL_Y_TO_LIMIT_OTSTUP:
+        if (stepY.getLimitMinus()) {
+            stepY.stop();
+        }
+        stepY.setCounterPWM(stepY.deviation * stepY.coeff);
         currentCalibrationState = CAL_Y_DEVIATION;
+        stepY.previousValue = stepY.currentValue;
+        stepY.startMinus();
         break;
     case CAL_Y_DEVIATION:
         stepY.currentValue = stepY.getCounterPWM() / stepY.coeff;
-        if (stepY.currentValue >= stepY.stopValue) {
+        // TODO: send current value
+        if (stepY.previousValue != stepY.currentValue) {
+            Udp::pThis->MustSend = true;
+            Udp::pThis->reply.currentReply = Protocol::CURRENT_Y;
+            Udp::pThis->reply.val = stepY.currentValue;
+        }
+        stepY.previousValue = stepY.currentValue;
+
+        if (stepY.getCounterPWM() <= 1) {
             stepY.stop();
             stepY.currentValue = 0;
             stepY.clearPwmCounter();
@@ -247,6 +260,7 @@ void StateMachine::calibrationHandler() {
         }
         break;
     case CAL_Y_STOP:
+        stepY.clearPwmCounter();
         udp.MustSend = true;
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_Y_STOP;
         udp.reply.val = stepY.currentValue;

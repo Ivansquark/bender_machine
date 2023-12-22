@@ -11,16 +11,17 @@ Protocol::Command Protocol::parseFrame(uint8_t* arr,
     return temp;
 }
 Protocol::CommandSet Protocol::parseFrameSet(uint8_t* arr,
-                                           [[maybe_unused]] uint8_t len) {
+                                             [[maybe_unused]] uint8_t len) {
     //-------------------------------------------------------------------------
-    CommandSet temp{
-        (Commands)arr[1],
-        (uint32_t)((arr[2] << 24) + (arr[3] << 16) + (arr[4] << 8) + arr[5]),
-        (uint32_t)((arr[6] << 24) + (arr[7] << 16) + (arr[8] << 8) + arr[9]),
-        (uint32_t)((arr[10] << 24) + (arr[11] << 16) + (arr[12] << 8) +
-                   arr[13]),
-        (uint32_t)((arr[14] << 24) + (arr[15] << 16) + (arr[16] << 8) +
-                   arr[17])};
+    uint32_t coefY =
+        (uint32_t)((arr[2] << 24) + (arr[3] << 16) + (arr[4] << 8) + arr[5]);
+    uint32_t coefX =
+        (uint32_t)((arr[6] << 24) + (arr[7] << 16) + (arr[8] << 8) + arr[9]);
+    CommandSet temp{(Commands)arr[1], *(float*)(&coefY), *(float*)(&coefX),
+                    (uint32_t)((arr[10] << 24) + (arr[11] << 16) +
+                               (arr[12] << 8) + arr[13]),
+                    (uint32_t)((arr[14] << 24) + (arr[15] << 16) +
+                               (arr[16] << 8) + arr[17])};
     return temp;
 }
 uint16_t Protocol::crc16(uint8_t* data, uint8_t len) {
