@@ -66,8 +66,8 @@ class Fileops : public QObject {
     void setFilePauto(Pauto val);
 
     struct Settings {
-        uint32_t coefY = 100;
-        uint32_t coefX = 100;
+        float coefY = 100;
+        float coefX = 100;
         uint32_t deviationY = 100;
         uint32_t deviationX = 100;
     };

@@ -1,5 +1,7 @@
 #include "fileops.h"
 
+#include <iostream>
+
 Fileops::Fileops() { init(); }
 
 Fileops::~Fileops() {}
@@ -128,8 +130,12 @@ Fileops::Settings Fileops::getSettings() {
         }
         file.close();
         // change values
-        currentSettings.coefY = std::stoi(vectStr[34]);
-        currentSettings.coefX = std::stoi(vectStr[35]);
+        QString strY = vectStr[34].c_str();
+        QString strX = vectStr[35].c_str();
+//        currentSettings.coefY = std::stof(vectStr[34]);
+//        currentSettings.coefX = std::stof(vectStr[35]);
+        currentSettings.coefY = strY.toFloat();
+        currentSettings.coefX = strX.toFloat();
         currentSettings.deviationY = std::stoi(vectStr[36]);
         currentSettings.deviationX = std::stoi(vectStr[37]);
     }
@@ -149,8 +155,10 @@ void Fileops::setSettings(Settings set) {
         file.close();
 
         // change values
-        vectStr[34] = std::to_string(currentSettings.coefY);
-        vectStr[35] = std::to_string(currentSettings.coefX);
+//        vectStr[34] = std::to_string(currentSettings.coefY);
+//        vectStr[35] = std::to_string(currentSettings.coefX);
+        vectStr[34] = QString::number(currentSettings.coefY, 'f', 2).toStdString();
+        vectStr[35] = QString::number(currentSettings.coefX, 'f', 2).toStdString();
         vectStr[36] = std::to_string(currentSettings.deviationY);
         vectStr[37] = std::to_string(currentSettings.deviationX);
 

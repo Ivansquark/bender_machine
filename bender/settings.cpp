@@ -89,9 +89,16 @@ void Settings::init() {
     //-------------------- Spinboxes ------------------------------------------
     QList<QSpinBox*> listSpins = this->findChildren<QSpinBox*>();
     for (auto&& s : listSpins) {
-        s->setFixedSize(200, 100);
+        s->setFixedSize(300, 100);
         s->setStyleSheet(Style::SpinSettings);
         s->setMaximum(65535);
+    }
+    QList<QDoubleSpinBox*> listDSpins = this->findChildren<QDoubleSpinBox*>();
+    for (auto&& s : listDSpins) {
+        s->setFixedSize(300, 100);
+        s->setStyleSheet(Style::SpinSettings);
+        s->setSingleStep(0.01);
+        s->setMaximum(500);
     }
     enable(false);
 }

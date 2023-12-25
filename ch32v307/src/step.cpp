@@ -1,4 +1,5 @@
 #include "step.h"
+#include <math.h>
 
 StepY* StepY::pThis = nullptr;
 
@@ -60,7 +61,7 @@ void StepY::handler() {
         break;
     case START_MOVING:
         // if (currentValue < stopValue) {
-        if (pwm.counter < (uint32_t)((float)stopValue * coeff)) {
+        if (pwm.counter < (uint32_t)(ceil((float)stopValue * coeff))) {
             currentState = MOVING_PLUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_Y;
@@ -70,7 +71,7 @@ void StepY::handler() {
             pwm.slow();
             // TODO: block all
             //} else if (currentValue > stopValue) {
-        } else if (pwm.counter > (uint32_t)((float)stopValue * coeff)) {
+        } else if (pwm.counter > (uint32_t)(ceil((float)stopValue * coeff))) {
             currentState = MOVING_MINUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_Y;
@@ -88,7 +89,7 @@ void StepY::handler() {
         break;
     case MOVING_PLUS:
         // if (currentValue >= stopValue) {
-        if (pwm.counter >= (uint32_t)((float)stopValue * coeff)) {
+        if (pwm.counter >= (uint32_t)(ceil((float)stopValue * coeff))) {
             stop();
             currentState = STOP;
             // send signal about final place
@@ -119,7 +120,7 @@ void StepY::handler() {
         break;
     case MOVING_MINUS:
         // if (currentValue <= stopValue) {
-        if (pwm.counter <= (uint32_t)((float)stopValue * coeff)) {
+        if (pwm.counter <= (uint32_t)(ceil((float)stopValue * coeff))) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
@@ -213,7 +214,7 @@ void StepX::handler() {
         break;
     case START_MOVING:
         // if (currentValue < stopValue) {
-        if (pwm.counter < (uint32_t)((float)stopValue * coeff)) {
+        if (pwm.counter < (uint32_t)(ceil((float)stopValue * coeff))) {
             currentState = MOVING_PLUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_X;
@@ -222,7 +223,7 @@ void StepX::handler() {
             startPlus();
             // TODO: block all
             //} else if (currentValue > stopValue) {
-        } else if (pwm.counter > (uint32_t)((float)stopValue * coeff)) {
+        } else if (pwm.counter > (uint32_t)(ceil((float)stopValue * coeff))) {
             currentState = MOVING_MINUS;
             Udp::pThis->MustSend = true;
             Udp::pThis->reply.currentReply = Protocol::START_X;
@@ -239,7 +240,7 @@ void StepX::handler() {
         }
         break;
     case MOVING_PLUS:
-        if (pwm.counter >= (uint32_t)((float)stopValue * coeff)) {
+        if (pwm.counter >= (uint32_t)(ceil((float)stopValue * coeff))) {
             stop();
             currentState = STOP;
             // TODO: send signal about final place
@@ -277,7 +278,7 @@ void StepX::handler() {
         break;
     case MOVING_MINUS:
         // if (currentValue <= stopValue) {
-        if (pwm.counter <= (uint32_t)((float)stopValue * coeff)) {
+        if (pwm.counter <= (uint32_t)(ceil((float)stopValue * coeff))) {
             // if (pwm.counterX * coeff >= stopValue) {
             stop();
             currentState = STOP;

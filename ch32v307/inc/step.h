@@ -71,9 +71,9 @@ class StepY {
     Gpios::In<Gpios::PB, 14, Gpios::InitModeIn::FLOATING> err;
     Gpios::In<Gpios::PA, 2, Gpios::InitModeIn::FLOATING> block_up;
     Gpios::In<Gpios::PA, 0, Gpios::InitModeIn::FLOATING> up_ok;
-    Gpios::In<Gpios::PC, 1, Gpios::InitModeIn::FLOATING> zerro;
+    Gpios::In<Gpios::PC, 1, Gpios::InitModeIn::FLOATING> konc;
     Gpios::In<Gpios::PC, 3, Gpios::InitModeIn::FLOATING> otstup;
-    Gpios::In<Gpios::PA, 1, Gpios::InitModeIn::FLOATING> konc;
+    Gpios::In<Gpios::PA, 1, Gpios::InitModeIn::FLOATING> zerro;
     Gpios::In<Gpios::PC, 0, Gpios::InitModeIn::FLOATING> rezerv1;
     Gpios::In<Gpios::PC, 2, Gpios::InitModeIn::FLOATING> rezerv2;
 

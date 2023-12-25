@@ -36,14 +36,22 @@ void Interface::sendDataSettings(const Protocol::CommandSet& data) {
     QByteArray arr;
     arr.append(Protocol::TO);
     arr.append((uint8_t)currentCommandSet.currentCommand);
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 24));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 16));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 8));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY)));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 24));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 16));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 8));
-    arr.append((uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX)));
+    arr.append((
+        uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 24));
+    arr.append((
+        uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 16));
+    arr.append(
+        (uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY) >> 8));
+    arr.append(
+        (uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefY)));
+    arr.append((
+        uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 24));
+    arr.append((
+        uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 16));
+    arr.append(
+        (uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX) >> 8));
+    arr.append(
+        (uint8_t)(*reinterpret_cast<uint32_t*>(&currentCommandSet.coefX)));
     arr.append((uint8_t)(currentCommandSet.deviationY >> 24));
     arr.append((uint8_t)(currentCommandSet.deviationY >> 16));
     arr.append((uint8_t)(currentCommandSet.deviationY >> 8));
@@ -67,12 +75,14 @@ void Interface::receiveData(const QByteArray& arr) {
     // parse data
     if (arr[1] == Protocol::Replies::SETTINGS) {
         currentReplySet.currentReply = (Protocol::Replies)arr[1];
-        currentReplySet.coefY = *reinterpret_cast<float*>(
+        uint32_t coefy =
             (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
-                       ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]));
-        currentReplySet.coefX = *reinterpret_cast<float*>(
+                       ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
+        currentReplySet.coefY = *reinterpret_cast<float*>(&coefy);
+        uint32_t coefx =
             (uint32_t)(((uint8_t)arr[6] << 24) | ((uint8_t)arr[7] << 16) |
-                       ((uint8_t)arr[8] << 8) | (uint8_t)arr[9]));
+                       ((uint8_t)arr[8] << 8) | (uint8_t)arr[9]);
+        currentReplySet.coefX = *reinterpret_cast<float*>(&coefx);
         currentReplySet.deviationY =
             (uint32_t)(((uint8_t)arr[10] << 24) | ((uint8_t)arr[11] << 16) |
                        ((uint8_t)arr[12] << 8) | (uint8_t)arr[13]);
@@ -88,7 +98,7 @@ void Interface::receiveData(const QByteArray& arr) {
     } else if (arr[1] == Protocol::Replies::NEED_CALIBRATION) {
         currentReply.currentReply = (Protocol::Replies)arr[1];
         sendReply();
-        //QThread::usleep(1000);
+        // QThread::usleep(1000);
         emit sendCurrentReply(currentReply);
     } else {
         currentReply.currentReply = (Protocol::Replies)arr[1];
@@ -96,7 +106,7 @@ void Interface::receiveData(const QByteArray& arr) {
             (uint32_t)(((uint8_t)arr[2] << 24) | ((uint8_t)arr[3] << 16) |
                        ((uint8_t)arr[4] << 8) | (uint8_t)arr[5]);
         if (currentReply.val > 99999) {
-            //qDebug() << (uint8_t)arr[2];
+            // qDebug() << (uint8_t)arr[2];
         }
         sendReply();
         emit sendCurrentReply(currentReply);
