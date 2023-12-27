@@ -40,11 +40,14 @@ class StepY {
     inline bool getLimitMinus() { return zerro.getState(); }
     inline bool getLimitOtstup() { return otstup.getState(); }
 
-
     float coeff = COEFF_PWM_TO_MM;
     static constexpr float COEFF_PWM_TO_MM = 119.617F;
     uint32_t deviation = DEVIATION;
     static constexpr uint32_t DEVIATION = 50;
+
+    inline void pwm_slow() { pwm.slow(); }
+    inline void pwm_fast() { pwm.fast(); }
+    inline void pwm_max() { pwm.max(); }
 
   private:
     // void init();
@@ -112,12 +115,14 @@ class StepX {
     inline bool getLimitMinus() { return zerro.getState(); }
     inline bool getLimitOtstup() { return otstup.getState(); }
 
-
     float coeff = COEFF_PWM_TO_MM;
     static constexpr float COEFF_PWM_TO_MM = 100.0F;
     uint32_t deviation = COEFF_PWM_TO_MM;
     static constexpr uint32_t DEVIATION = 10;
 
+    inline void pwm_slow() { pwm.slow(); }
+    inline void pwm_fast() { pwm.fast(); }
+    inline void pwm_max() { pwm.max(); }
   private:
     void init();
 

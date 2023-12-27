@@ -13,6 +13,7 @@ class PwmY {
 
     void slow();
     void fast();
+    void max();
 
     enum Direction {
         UP,
@@ -36,6 +37,7 @@ class PwmX {
 
     void slow();
     void fast();
+    void max();
 
     enum Direction {
         PLUS,

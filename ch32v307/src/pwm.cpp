@@ -18,6 +18,10 @@ void PwmY::fast() {
     TIM9->ATRLR = 100 - 1;
     TIM9->CH3CVR = TIM9->ATRLR / 5; // duty cycle 20%
 }
+void PwmY::max() {
+    TIM9->ATRLR = 10 - 1;
+    TIM9->CH3CVR = TIM9->ATRLR / 5; // duty cycle 20%
+}
 
 void PwmY::init() {
     // TODO: init 2 pwm E8-TIM1_CH1N_3-X D12-TIM9_CH3N_2-Y
@@ -68,11 +72,15 @@ PwmX::PwmX() {
 
 void PwmX::slow() {
     TIM1->ATRLR = 200 - 1;
-    TIM1->CH3CVR = TIM1->ATRLR / 5; // duty cycle 20%
+    TIM1->CH1CVR = TIM1->ATRLR / 5; // duty cycle 20%
 }
 void PwmX::fast() {
     TIM1->ATRLR = 100 - 1;
-    TIM1->CH3CVR = TIM1->ATRLR / 5; // duty cycle 20%
+    TIM1->CH1CVR = TIM1->ATRLR / 5; // duty cycle 20%
+}
+void PwmX::max() {
+    TIM1->ATRLR = 20 - 1;
+    TIM1->CH1CVR = TIM1->ATRLR / 5; // duty cycle 20%
 }
 
 void PwmX::init() {

@@ -184,7 +184,8 @@ void StateMachine::calibrationHandler() {
     case CAL_X_START:
         udp.MustSend = true;
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_START;
-        stepX.startMinus();
+        stepX.pwm_max();
+        stepX.startPlus();
         currentCalibrationState = CAL_X_TO_LIMIT_PLUS;
         // TODO: check speed
         break;
@@ -225,12 +226,14 @@ void StateMachine::calibrationHandler() {
         }
         break;
     case CAL_X_STOP:
+        stepX.pwm_slow();
         udp.MustSend = true;
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_X_STOP;
         udp.reply.val = stepX.currentValue;
         currentCalibrationState = CAL_Y_START;
         break;
     case CAL_Y_START:
+        stepY.pwm_max();
         stepY.startPlus();
         currentCalibrationState = CAL_Y_TO_LIMIT_PLUS;
         break;
@@ -271,6 +274,7 @@ void StateMachine::calibrationHandler() {
         }
         break;
     case CAL_Y_STOP:
+        stepY.pwm_slow();
         stepY.clearPwmCounter();
         udp.MustSend = true;
         udp.reply.currentReply = Protocol::Replies::CALIBRATION_Y_STOP;
