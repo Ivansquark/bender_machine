@@ -15,7 +15,7 @@ Screen::~Screen() {
 }
 
 void Screen::init() {
-    // setFixedSize(1024, 600);
+    setFixedSize(1024, 600);
     setStyleSheet(Style::BackgroundMain);
     // connect(butExit, &QPushButton::clicked, [this] { close(); });
     //labGetPosY->setSizePolicy(QSizePolicy(QSizePolicy::Fixed, QSizePolicy::Fixed));
@@ -364,7 +364,8 @@ void Screen::mousePressEvent(QMouseEvent* event) {
 
         if (IsCalibrated) return;
         set->setModal(true);
-        set->showFullScreen();
+        set->show();
+        //set->showFullScreen();
     }
     //    if (event->pos().x() >= control->butDash->x() &&
     //        event->pos().x() <= control->butDash->x() +

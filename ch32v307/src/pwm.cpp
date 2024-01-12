@@ -11,11 +11,11 @@ PwmY::PwmY() {
 }
 
 void PwmY::slow() {
-    TIM9->ATRLR = 200 - 1;
+    TIM9->ATRLR = 40 - 1;
     TIM9->CH3CVR = TIM9->ATRLR / 5; // duty cycle 20%
 }
 void PwmY::fast() {
-    TIM9->ATRLR = 100 - 1;
+    TIM9->ATRLR = 20 - 1;
     TIM9->CH3CVR = TIM9->ATRLR / 5; // duty cycle 20%
 }
 void PwmY::max() {

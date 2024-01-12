@@ -9,7 +9,8 @@
 class Touch : public QObject {
     Q_OBJECT
 
-    QString fileName = "/dev/input/by-path/platform-3f204000.spi-cs-1-event";
+    //QString fileName = "/dev/input/by-path/platform-3f204000.spi-cs-1-event";
+    QString fileName = "/dev/input/by-path/platform-3f204000.spi-event";
     QSocketNotifier* notifier;
     int fd;
 

@@ -21,7 +21,7 @@ void Settings::firstSendSettings(const Protocol::CommandSet& val) {
 }
 
 void Settings::init() {
-    //setFixedSize(1024, 600);
+    setFixedSize(1024, 600);
 
     //--------------- Layouts -------------------------------------------------
     layPass13->addWidget(but1);
