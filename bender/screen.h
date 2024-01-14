@@ -28,11 +28,11 @@ class Screen : public QDialog {
     Screen(QWidget* parent = nullptr);
     ~Screen();
 
-    enum AutoState : uint8_t {
-        MANUAL,
-        SEMI_AUTO,
-        AUTO
-    };
+//    enum AutoState : uint8_t {
+//        MANUAL,
+//        SEMI_AUTO,
+//        AUTO
+//    };
 
   private:
     void init();

@@ -537,7 +537,13 @@ void Screen::onButStartPressed() {
 }
 void Screen::onButStartReleased() {
     control->setStart(false);
-    currentCommand.currentCommand = Protocol::SEND_STOP;
+    if(currentPauto == Fileops::Pauto::MANUAL) {
+        currentCommand.currentCommand = Protocol::SEND_STOP;
+    } else if(currentPauto == Fileops::Pauto::SEMI_AUTO) {
+
+    } else if(currentPauto == Fileops::Pauto::AUTO) {
+
+    }
     interface->sendData(currentCommand);
 }
 
